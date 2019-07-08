@@ -12,12 +12,12 @@ class AccountInvoice(models.Model):
 
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):
-        if self.pricelist_id.discount_policy != "without_discount":
-            raise UserError(
-                _('Selected Pricelist\'s Discount Policy must be "Show public price & discount to the customer".\n')
-            )
-
         for inv in self:
+            if inv.pricelist_id.discount_policy != "without_discount" and inv.pricelist_id:
+                raise UserError(
+                    _('Selected Pricelist\'s Discount Policy must be "Show public price & discount to the customer".\n')
+                )
+
             for line in inv.invoice_line_ids:
                 if not (line.product_id and line.uom_id and self.pricelist_id and
                         self.pricelist_id.discount_policy == 'without_discount'):
