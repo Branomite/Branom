@@ -23,16 +23,6 @@ class AccountInvoice(models.Model):
                         self.pricelist_id.discount_policy == 'without_discount'):
                     return
                 line.discount = 0.0
-
-                product = line.product_id.with_context(
-                    lang=self.partner_id.lang,
-                    partner=self.partner_id,
-                    quantity=line.quantity,
-                    date=self.date_invoice,
-                    pricelist=self.pricelist_id.id,
-                    uom=line.uom_id.id,
-                    fiscal_position=self.env.context.get('fiscal_position')
-                )
                 
                 product_context = dict(line.env.context, partner_id=self.partner_id.id,
                                        date=self.date_invoice, uom=line.uom_id.id)
