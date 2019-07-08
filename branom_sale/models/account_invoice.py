@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError, ValidationError
 
 
 class AccountInvoice(models.Model):
@@ -11,6 +12,11 @@ class AccountInvoice(models.Model):
 
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):
+        if self.pricelist_id.discount_policy != "without_discount":
+            raise UserError(
+                _('Selected Pricelist\'s Discount Policy must be "Show public price & discount to the customer".\n')
+            )
+
         for inv in self:
             for line in inv.invoice_line_ids:
                 if not (line.product_id and line.uom_id and self.pricelist_id and
@@ -27,16 +33,13 @@ class AccountInvoice(models.Model):
                     uom=line.uom_id.id,
                     fiscal_position=self.env.context.get('fiscal_position')
                 )
-                print(product)
-
+                
                 product_context = dict(line.env.context, partner_id=self.partner_id.id,
                                        date=self.date_invoice, uom=line.uom_id.id)
                 # Must pass in SO Unit Price to keep unit price consistent when calculating the discount.
                 price, rule_id = self.pricelist_id.with_context(product_context).inv_get_product_price_rule(
                     line.product_id, line.quantity or 1.0, self.partner_id, line.price_unit)
 
-                print(price)
-                print(rule_id)
                 # Set new_list_price to be the line's unit price.
                 # This is always the same as it is pulled from SO not template
                 new_list_price = line.price_unit
