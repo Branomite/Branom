@@ -8,9 +8,20 @@ class SaleOrder(models.Model):
 
     sales_type = fields.Selection([
         ('commission', 'Commission Sale'),
-        ('distribution', 'Distribution Sale'),
-        ('service', 'Service Sale'),
+        ('regular', 'Non-Commission Sale'),
         ], string="Sales Type")
+
+    # Auto lock the order after confirmation if commission type.
+    # Ensure no changes made after.
+    @api.multi
+    def action_confirm(self):
+        res = super(SaleOrder, self).action_confirm()
+        for order in self:
+            if order.sales_type == 'commission':
+                order.action_done()
+                for line in order.order_line:
+                    line.qty_delivered = line.product_uom_qty
+        return res
 
 
 class SaleOrderLine(models.Model):
@@ -56,9 +67,3 @@ class SaleOrderLine(models.Model):
             line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount']/100))
             line['discount'] = 0.0
         return res
-
-    # @api.onchange('product_id', 'price_unit', 'product_uom', 'product_uom_qty', 'tax_id')
-    # def _onchange_discount(self):
-    #     # print("hello")
-    #     super(SaleOrderLine, self)._onchange_discount()
-    #     # print("did discount change?")

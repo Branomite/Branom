@@ -8,7 +8,6 @@ class AccountInvoice(models.Model):
     _inherit = "account.invoice"
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
-    # need pricelist function in sale > mimic: get_display_price
 
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):

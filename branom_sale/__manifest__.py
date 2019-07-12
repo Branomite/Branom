@@ -13,14 +13,12 @@
         2. Bring the customer pricelist functionality to invoices as well
 
         3. Adjust the unit price on invoice lines automatically
+        
+        4. Auto lock the SO after confirmation. 
     """,
 
     'author': "Odoo",
     'website': "http://www.odoo.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/12.0/odoo/addons/base/data/ir_module_category_data.xml
-    # for the full list
     'category': 'Uncategorized',
     'version': '0.1',
 
