@@ -13,14 +13,30 @@ class SaleOrder(models.Model):
 
     # Auto lock the order after confirmation if commission type.
     # Ensure no changes made after.
+    # @api.multi
+    # def action_confirm(self):
+    #     res = super(SaleOrder, self).action_confirm()
+    #     for order in self:
+    #         if order.sales_type == 'commission':
+    #             order.action_done()
+    #             for line in order.order_line:
+    #                 line.qty_delivered = line.product_uom_qty
+    #     return res
+
+    # @api.onchange('order_line')
+    # def _saleorder_line_change(self):
+    #     # Only when state is sale and commission, always set the delivered qty to ordered qty
+    #     for order in self.filtered(lambda o: o.state == 'sale' and o.sales_type == 'commission'):
+    #         for line in order.order_line:
+    #             line.qty_delivered = line.product_uom_qty
+
     @api.multi
-    def action_confirm(self):
-        res = super(SaleOrder, self).action_confirm()
-        for order in self:
-            if order.sales_type == 'commission':
-                order.action_done()
-                for line in order.order_line:
-                    line.qty_delivered = line.product_uom_qty
+    def write(self, values):
+        res = super(SaleOrder, self).write(values)
+        # Only when state is sale and commission, always set the delivered qty to ordered qty
+        for order in self.filtered(lambda o: o.state == 'sale' and o.sales_type == 'commission'):
+            for line in order.order_line:
+                line.qty_delivered = line.product_uom_qty
         return res
 
 
