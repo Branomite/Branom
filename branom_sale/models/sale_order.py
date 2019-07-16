@@ -60,6 +60,6 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self).invoice_line_create_vals(invoice_id, qty)
         for line in res:
             # Take the unit_price and subtract the discount amount, set as new invoice unit price.
-            line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount']/100))
+            line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount']/100.0))
             line['discount'] = 0.0
         return res

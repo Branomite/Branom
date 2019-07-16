@@ -33,14 +33,14 @@ class AccountInvoice(models.Model):
                 # This is always the same as it is pulled from SO not template
                 new_list_price = line.price_unit
 
-                if new_list_price != 0:
+                if new_list_price != 0.0:
                     if self.pricelist_id.currency_id != line.currency_id:
                         # We need new_list_price in the same currency as price,
                         # which is in the SO's pricelist's currency
                         new_list_price = line.currency_id._convert(
                             new_list_price, self.pricelist_id.currency_id,
                             self.company_id, self.date_invoice or fields.Date.today())
-                    discount = (new_list_price - price) / new_list_price * 100
-                    if (discount > 0 and new_list_price > 0) or (discount < 0 and new_list_price < 0):
+                    discount = ((new_list_price - price) / new_list_price) * 100.0
+                    if (discount > 0.0 and new_list_price > 0.0) or (discount < 0.0 and new_list_price < 0.0):
                         line.discount = discount
 
