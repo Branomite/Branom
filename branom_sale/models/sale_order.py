@@ -11,25 +11,6 @@ class SaleOrder(models.Model):
         ('regular', 'Non-Commission Sale'),
         ], string="Sales Type")
 
-    # Auto lock the order after confirmation if commission type.
-    # Ensure no changes made after.
-    # @api.multi
-    # def action_confirm(self):
-    #     res = super(SaleOrder, self).action_confirm()
-    #     for order in self:
-    #         if order.sales_type == 'commission':
-    #             order.action_done()
-    #             for line in order.order_line:
-    #                 line.qty_delivered = line.product_uom_qty
-    #     return res
-
-    # @api.onchange('order_line')
-    # def _saleorder_line_change(self):
-    #     # Only when state is sale and commission, always set the delivered qty to ordered qty
-    #     for order in self.filtered(lambda o: o.state == 'sale' and o.sales_type == 'commission'):
-    #         for line in order.order_line:
-    #             line.qty_delivered = line.product_uom_qty
-
     @api.multi
     def write(self, values):
         res = super(SaleOrder, self).write(values)
@@ -47,7 +28,8 @@ class SaleOrderLine(models.Model):
     def _action_launch_stock_rule(self):
         for line in self:
             if line.order_id.sales_type == 'commission':
-                # Still need to create group_id in case it is used else where
+                # Still need to create group_id in case it is used elsewhere
+                # Following code copied from sale_stock's sale_order.py
                 group_id = line.order_id.procurement_group_id
                 if not group_id:
                     group_id = self.env['procurement.group'].create({
@@ -66,8 +48,8 @@ class SaleOrderLine(models.Model):
                         updated_vals.update({'move_type': line.order_id.picking_policy})
                     if updated_vals:
                         group_id.write(updated_vals)
+
                 # Update the qty delivered to be same as ordered to trigger invoice creation
-                # This does not seem like a good idea... If they change the SOL then it does not update
                 line.qty_delivered = line.product_uom_qty
             else:
                 return super(SaleOrderLine, self)._action_launch_stock_rule()
@@ -77,9 +59,7 @@ class SaleOrderLine(models.Model):
     def invoice_line_create_vals(self, invoice_id, qty):
         res = super(SaleOrderLine, self).invoice_line_create_vals(invoice_id, qty)
         for line in res:
-            # Take the unit_price and subtract the discount amount.
-            # This will become the new unit price in the invoice.
-            # Also reset the discount to 0.0
+            # Take the unit_price and subtract the discount amount, set as new invoice unit price.
             line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount']/100))
             line['discount'] = 0.0
         return res

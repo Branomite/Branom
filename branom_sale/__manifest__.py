@@ -14,7 +14,7 @@
 
         3. Adjust the unit price on invoice lines automatically
         
-        4. Auto lock the SO after confirmation. 
+        4. Set delivered qty when sale order line is changed after Confirm.
     """,
 
     'author': "Odoo",
