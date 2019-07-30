@@ -23,7 +23,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['sale_stock', 'account', 'product'],
+    'depends': ['account', 'product', 'sale_account_taxcloud'],
 
     # always loaded
     'data': [

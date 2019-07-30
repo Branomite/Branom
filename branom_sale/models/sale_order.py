@@ -12,11 +12,11 @@ class SaleOrder(models.Model):
         ], string="Sales Type")
 
     @api.multi
-    def write(self, values):
-        res = super(SaleOrder, self).write(values)
-        # Only when state is sale and commission, always set the delivered qty to ordered qty
+    def action_confirm(self):
+        res = super(SaleOrder, self).action_confirm()
         for order in self.filtered(lambda o: o.state == 'sale' and o.sales_type == 'commission'):
             for line in order.order_line:
+                line.qty_delivered_method = 'manual'
                 line.qty_delivered = line.product_uom_qty
         return res
 
