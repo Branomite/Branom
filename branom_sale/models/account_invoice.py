@@ -9,6 +9,20 @@ class AccountInvoice(models.Model):
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
 
+    @api.multi
+    def finalize_invoice_move_lines(self, move_lines):
+        res = super(AccountInvoice, self).finalize_invoice_move_lines(move_lines)
+        # Zero out the JE if the SO is commission type
+        if self.invoice_line_ids.mapped('sale_line_ids.order_id').sales_type == 'commission':
+            zero_ml = []
+            for move in res:
+                temp_dict = move[2]
+                temp_dict['credit'] = False
+                temp_dict['debit'] = False
+                zero_ml.append(move[:2]+(temp_dict,))
+            res = zero_ml
+        return res
+
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):
         for inv in self:
