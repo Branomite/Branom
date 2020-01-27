@@ -30,8 +30,7 @@ class AccountInvoice(models.Model):
                     zero_ml.append(move[:2]+(temp_dict,))
                 else:
                     zero_ml.append(move)
-            res = zero_ml
-        return res
+        return zero_ml
 
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):
@@ -68,3 +67,27 @@ class AccountInvoice(models.Model):
                     if (discount > 0.0 and new_list_price > 0.0) or (discount < 0.0 and new_list_price < 0.0):
                         line.discount = discount
 
+
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    # @api.model
+    # def _default_account(self):
+    #     res = super(AccountInvoiceLine, self)._default_account()
+    #     print("THIS account invoice line IS TRIGGERED ON INV << super of default")
+    #     if self.sale_line_ids:
+    #         print("We have a SO(s) tied to the account")
+    #     return res
+
+    @api.model
+    def create(self, vals):
+        print("THIS CREATE IS TRIGGERED ON INV LINE")
+        res = super(AccountInvoiceLine, self).create(vals)
+        if res.sale_line_ids.filtered(lambda s: s.order_id.sales_type == 'commission') and res.company_id.commission_account_id:
+            print("Sale order is tied to the commission")
+            res.account_id = res.company_id.commission_account_id
+        return res
+
+    # account_id = fields.Many2one('account.account', string='Account', domain=[('deprecated', '=', False)],
+    #                              default=_default_account,
+    #                              help="The income or expense account related to the selected product.")

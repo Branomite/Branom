@@ -20,9 +20,9 @@
 
     """,
 
-    'author': "Odoo",
+    'author': "PS-US Odoo",
     'website': "http://www.odoo.com",
-    'category': 'Uncategorized',
+    'category': 'Custom Development',
     'version': '0.1',
 
     # any module necessary for this one to work correctly
@@ -33,6 +33,7 @@
         'views/sale_order_views.xml',
         'views/account_invoice_views.xml',
         'views/price_list_views.xml',
+        'views/res_config_views.xml',
     ],
 
 }
