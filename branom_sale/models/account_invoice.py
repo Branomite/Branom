@@ -30,7 +30,8 @@ class AccountInvoice(models.Model):
                     zero_ml.append(move[:2]+(temp_dict,))
                 else:
                     zero_ml.append(move)
-        return zero_ml
+            return zero_ml
+        return res
 
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):
