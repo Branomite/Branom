@@ -4,8 +4,15 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 
 
+class AccountAccount(models.Model):
+    _inherit = 'account.account'
+
+    is_zero_comm = fields.Boolean(string='Allow Zero for Commission Type',
+                                  help='Set True to allow this account to zero out the balances for Journal Entries.')
+
+
 class AccountInvoice(models.Model):
-    _inherit = "account.invoice"
+    _inherit = 'account.invoice'
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
 
@@ -16,10 +23,13 @@ class AccountInvoice(models.Model):
         if self.invoice_line_ids.mapped('sale_line_ids.order_id').sales_type == 'commission':
             zero_ml = []
             for move in res:
-                temp_dict = move[2]
-                temp_dict['credit'] = False
-                temp_dict['debit'] = False
-                zero_ml.append(move[:2]+(temp_dict,))
+                if self.env['account.account'].browse(move[2]['account_id']).is_zero_comm:
+                    temp_dict = move[2]
+                    temp_dict['credit'] = False
+                    temp_dict['debit'] = False
+                    zero_ml.append(move[:2]+(temp_dict,))
+                else:
+                    zero_ml.append(move)
             res = zero_ml
         return res
 
