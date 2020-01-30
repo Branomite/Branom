@@ -7,9 +7,7 @@
             <field name="inherit_id" ref="account.res_config_settings_view_form"/>
             <field name="arch" type="xml">
                 <div id="recommended_apps" position="after">
-                    <h2 groups="account.group_account_user"
-                        attrs="{'invisible': [('module_account_reports', '=', False)]}">Commission
-                    </h2>
+                    <h2 groups="account.group_account_user">Commission</h2>
                     <div class="row mt16 o_settings_container" id="account_commission_settings"
                          groups="account.group_account_user">
                         <div class="col-12 col-lg-6 o_setting_box"
