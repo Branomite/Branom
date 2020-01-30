@@ -4,10 +4,34 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 
 
+class AccountAccount(models.Model):
+    _inherit = 'account.account'
+
+    is_zero_comm = fields.Boolean(string='Allow Zero for Commission Type',
+                                  help='Set True to allow this account to zero out the balances for Journal Entries.')
+
+
 class AccountInvoice(models.Model):
-    _inherit = "account.invoice"
+    _inherit = 'account.invoice'
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
+
+    @api.multi
+    def finalize_invoice_move_lines(self, move_lines):
+        res = super(AccountInvoice, self).finalize_invoice_move_lines(move_lines)
+        # Zero out the JE if the SO is commission type
+        if self.invoice_line_ids.mapped('sale_line_ids.order_id').sales_type == 'commission':
+            zero_ml = []
+            for move in res:
+                if self.env['account.account'].browse(move[2]['account_id']).is_zero_comm:
+                    temp_dict = move[2]
+                    temp_dict['credit'] = False
+                    temp_dict['debit'] = False
+                    zero_ml.append(move[:2]+(temp_dict,))
+                else:
+                    zero_ml.append(move)
+            return zero_ml
+        return res
 
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):
@@ -44,3 +68,13 @@ class AccountInvoice(models.Model):
                     if (discount > 0.0 and new_list_price > 0.0) or (discount < 0.0 and new_list_price < 0.0):
                         line.discount = discount
 
+
+class AccountInvoiceLine(models.Model):
+    _inherit = 'account.invoice.line'
+
+    @api.model
+    def create(self, vals):
+        res = super(AccountInvoiceLine, self).create(vals)
+        if res.sale_line_ids.filtered(lambda s: s.order_id.sales_type == 'commission') and res.company_id.commission_account_id:
+            res.account_id = res.company_id.commission_account_id
+        return res

@@ -15,11 +15,14 @@
         3. Adjust the unit price on invoice lines automatically
         
         4. Set delivered qty when sale order line is changed after Confirm.
+        
+        5. Branom wants to set a different income account as the default account listed on invoice lines for commission sales. They would like the option to do so (i.e. in configuration settings).
+
     """,
 
-    'author': "Odoo",
+    'author': "PS-US Odoo",
     'website': "http://www.odoo.com",
-    'category': 'Uncategorized',
+    'category': 'Custom Development',
     'version': '0.1',
 
     # any module necessary for this one to work correctly
@@ -30,6 +33,7 @@
         'views/sale_order_views.xml',
         'views/account_invoice_views.xml',
         'views/price_list_views.xml',
+        'views/res_config_views.xml',
     ],
 
 }
