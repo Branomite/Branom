@@ -96,5 +96,10 @@ class AccountPayment(models.Model):
     def _create_payment_entry(self, amount):
         res = super(AccountPayment, self)._create_payment_entry(amount)
         if self.payment_difference_handling == 'reconcile' and self.payment_difference:
-            self.invoice_ids.write({'payment_difference': self.payment_difference})
+            total = sum(self.invoice_ids.mapped('amount_total'))
+            for invoice in self.invoice_ids:
+                invoice.write({
+                    'payment_difference': self.payment_difference * (invoice.amount_total / total)
+                })
         return res
+
