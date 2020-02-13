@@ -4,12 +4,21 @@ from odoo.addons import decimal_precision as dp
 
 
 class ProductTemplateAttributeValue(models.Model):
-    _inherit = "product.template.attribute.value"
+    _inherit = 'product.template.attribute.value'
 
-    cost_extra = fields.Float(
-        string="Attribute Cost Extra",
-        default=0.0,
-        digits=dp.get_precision("Product Price"),
-        help="""Cost Extra: Extra cost for the variant with
-        this attribute value on sale price. eg. 200 cost extra, 1000 + 200 = 1200.""",
-    )
+    cost_extra = fields.Float(string='Attribute Extra Cost', default=0.0,
+                              digits=dp.get_precision('Product Price'),
+                              help='Extra Cost: Extra cost for the variant with this attribute value on sale price. '
+                                   'eg. 200 cost extra, 1000 + 200 = 1200.')
+
+
+class ProductAttributeValue(models.Model):
+    _inherit = 'product.attribute.value'
+
+    manufacture_code = fields.Char(string='MC Input')
+    position = fields.Integer(string='Position')
+    separator = fields.Char(string='Separator')
+    affix_type = fields.Selection(string='Prefix/Suffix',
+                                  selection=[('prefix', 'Prefix'),
+                                             ('suffix', 'Suffix')])
+
