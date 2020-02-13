@@ -37,11 +37,9 @@ class ProductProduct(models.Model):
 
     @api.multi
     def generate_extra_code(self):
-        code = self.product_tmpl_id.base_default_code
+        code = self.product_tmpl_id.base_default_code or ''
         prefix, suffix = '', ''
 
-        # variant_alone = self.product_tmpl_id._get_valid_product_template_attribute_lines().filtered(
-        #     lambda line: line.attribute_id.create_variant == 'always' and len(line.value_ids) == 1).mapped('value_ids')
 
         for attr_val in self.attribute_value_ids.sorted(key=lambda r: r.position):
             if attr_val.affix_type == 'prefix':
@@ -53,7 +51,7 @@ class ProductProduct(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         res = super(ProductProduct, self).create(vals_list)
-        for prod in res:
+        for prod in res.filtered(lambda p: p.attribute_value_ids):
             prod.default_code = prod.generate_extra_code()
         return res
 
@@ -91,7 +89,9 @@ class SupplierInfo(models.Model):
         store=True,
     )
 
-    @api.depends('product_id', 'product_id.product_template_attribute_value_ids', 'product_id.product_template_attribute_value_ids.cost_extra')
+    # TODO: remove the other dependencies, might be too slow, need to convert to action talk to ALB
+    # @api.depends('product_id', 'product_id.product_template_attribute_value_ids', 'product_id.product_template_attribute_value_ids.cost_extra')
+    @api.depends('product_id')
     def _compute_product_cost_extra(self):
         for vendor_list in self.filtered(lambda v: v.product_id and v.product_id.product_template_attribute_value_ids):
             for value in vendor_list.product_id.product_template_attribute_value_ids:
