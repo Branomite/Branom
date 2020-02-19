@@ -76,7 +76,7 @@ class SupplierInfo(models.Model):
         digits=dp.get_precision('Product Price'),
         default=0.0,
         help='The extra cost of this variant based on attribute value\'s cost_extra.',
-        # store=True,
+        store=True,
     )
 
     price_with_extra = fields.Float(
@@ -85,7 +85,7 @@ class SupplierInfo(models.Model):
         help='The cost of this variant based on its product variant cost and its attribute values cost_extra.',
         compute='_compute_cost_variant',
         default=0.0,
-        # store=True,
+        store=True,
     )
 
     # Compute the cost extra: sum upp the cost_extra for each attribute value on product.product
@@ -103,5 +103,5 @@ class SupplierInfo(models.Model):
             if vendor_list.product_tmpl_id:
                 vendor_list.price_with_extra = vendor_list.product_tmpl_id.base_standard_price + vendor_list.cost_extra
                 # Automatically set the price on vendor pricelist
-                # vendor_list.price = vendor_list.price_with_extra
+                vendor_list.price = vendor_list.price_with_extra
 
