@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import time
 from odoo import models, fields, api, tools, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
@@ -35,10 +35,10 @@ class ProductProduct(models.Model):
                     'product_tmpl_id': prod.product_tmpl_id.id,
                     'product_id': prod.id,
                 }])
-            else:
-                raise UserError(
-                    _('Product\'s Vendor Pricelist cannot have zero or more than one Vendor(s).\n')
-                )
+            # else:
+            #     raise UserError(
+            #         _('Product\'s Vendor Pricelist cannot have zero or more than one Vendor(s).\n')
+            #     )
 
             # only create code if has attr_values
             if prod.attribute_value_ids:
@@ -51,10 +51,12 @@ class ProductTemplate(models.Model):
 
     base_standard_price = fields.Float(string='Base Cost', company_dependent=True,
                                        digits=dp.get_precision('Product Price'),
+                                       default=0.0,
                                        help='Cost used to compute the Vendor Price list with Extra Cost from Variants',
                                        groups='base.group_user', store=True)
 
-    base_default_code = fields.Char(string='Base Internal Reference')
+    base_default_code = fields.Char(string='Base Internal Reference',
+                                    help='Base Internal Reference for computing Auto-Generated Manufacturing Code')
 
     @api.multi
     def write(self, vals):
@@ -71,20 +73,19 @@ class SupplierInfo(models.Model):
     cost_extra = fields.Float(
         string='Variant Extra Cost',
         compute='_compute_product_cost_extra',
-        groups='base.group_user',
         digits=dp.get_precision('Product Price'),
         default=0.0,
         help='The extra cost of this variant based on attribute value\'s cost_extra.',
-        store=True,
+        # store=True,
     )
 
     price_with_extra = fields.Float(
         string='Price with Extra Cost',
-        groups='base.group_user',
         digits=dp.get_precision('Product Price'),
         help='The cost of this variant based on its product variant cost and its attribute values cost_extra.',
         compute='_compute_cost_variant',
-        store=True,
+        default=0.0,
+        # store=True,
     )
 
     # Compute the cost extra: sum upp the cost_extra for each attribute value on product.product
@@ -92,13 +93,15 @@ class SupplierInfo(models.Model):
     @api.depends('product_id', 'product_id.attribute_value_ids')
     def _compute_product_cost_extra(self):
         for vendor_list in self.filtered(lambda v: v.product_id and v.product_id.attribute_value_ids):
-            for value in vendor_list.product_id.attribute_value_ids:
-                vendor_list.cost_extra += value.cost_extra
+            vendor_list.cost_extra = sum(vendor_list.product_id.attribute_value_ids.mapped('cost_extra'))
 
     # Compute the total extra cost, includes: product.template's base_standard_price + product.supplierinfo's cost_extra
-    @api.depends('product_tmpl_id', 'product_tmpl_id.base_standard_price', 'cost_extra')
+    # @api.depends('product_tmpl_id', 'product_tmpl_id.base_standard_price', 'cost_extra')
+    @api.depends('product_tmpl_id', 'cost_extra')
     def _compute_cost_variant(self):
-        for vendor_list in self.filtered(lambda x: x.product_tmpl_id):
-            vendor_list.price_with_extra = vendor_list.product_tmpl_id.base_standard_price + vendor_list.cost_extra
-            # Automatically set the price on vendor pricelist
-            vendor_list.price = vendor_list.price_with_extra
+        for vendor_list in self:
+            if vendor_list.product_tmpl_id:
+                vendor_list.price_with_extra = vendor_list.product_tmpl_id.base_standard_price + vendor_list.cost_extra
+                # Automatically set the price on vendor pricelist
+                # vendor_list.price = vendor_list.price_with_extra
+

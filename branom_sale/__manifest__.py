@@ -45,7 +45,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['account', 'product', 'sale_account_taxcloud', 'purchase'],
+    'depends': ['account', 'product', 'sale_account_taxcloud'],
 
     # always loaded
     'data': [
