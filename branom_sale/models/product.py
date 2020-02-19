@@ -1,39 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api, tools, _
-from odoo.exceptions import ValidationError
+from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
 from odoo.tools.float_utils import float_compare, float_round
 
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
-    # TODO: remove this field properly.
-    cost_extra = fields.Float(
-        string='Cost Extra',
-        # company_dependent=True,
-        digits=dp.get_precision('Product Price'),
-        # compute='_compute_product_cost_extra',
-        # readonly=True,
-        # groups='base.group_user',
-        # store=True,
-    )
-
-    @api.depends('product_template_attribute_value_ids', 'product_template_attribute_value_ids.cost_extra')
-    def _compute_product_cost_extra(self):
-        for product in self:
-            print(
-                f"{product}, {product.product_template_attribute_value_ids}, {product.product_template_attribute_value_ids.cost_extra}"
-            )
-            product.cost_extra = sum(
-                product.mapped('product_template_attribute_value_ids.cost_extra')
-            )
-    # @api.multi
-    # def write(self, values):
-    #     ''' Store the standard price change in order to be able to retrieve the cost of a product for a given date'''
-    #     res = super(ProductProduct, self).write(values)
-    #     print("reach here?!?!")
-    #     return res
 
     @api.multi
     def generate_extra_code(self):
@@ -54,16 +28,17 @@ class ProductProduct(models.Model):
             # Create vendor list for each newly created product
             vendor_ids = prod.product_tmpl_id.variant_seller_ids.mapped('name')
 
+            # Only allow creation of vendor pricelist/product if ONE vendor present per product
             if len(vendor_ids) == 1:
-                vendor_list = self.env['product.supplierinfo'].create([{
+                self.env['product.supplierinfo'].create([{
                     'name': vendor_ids[0].id,
                     'product_tmpl_id': prod.product_tmpl_id.id,
                     'product_id': prod.id,
                 }])
-                print(vendor_list)
             else:
-                # TODO: add warning popup that pricelist won't be created with 2+ vendors
-                print("Placeholder for 0 or 2+ vendors warning")
+                raise UserError(
+                    _('Product\'s Vendor Pricelist cannot have zero or more than one Vendor(s).\n')
+                )
 
             # only create code if has attr_values
             if prod.attribute_value_ids:
@@ -95,7 +70,6 @@ class SupplierInfo(models.Model):
 
     cost_extra = fields.Float(
         string='Variant Extra Cost',
-        # related='product_id.cost_extra',
         compute='_compute_product_cost_extra',
         groups='base.group_user',
         digits=dp.get_precision('Product Price'),

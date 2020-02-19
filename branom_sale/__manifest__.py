@@ -55,6 +55,7 @@
         'views/res_config_views.xml',
         'views/product_attribute_views.xml',
         'views/product_views.xml',
+        'data/actions.xml',
     ],
 
 }
