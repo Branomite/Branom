@@ -9,6 +9,18 @@
 		<field name="exclude_discount"/>
 	      </xpath>
             </field>
-        </record>
+      </record>
+      
+      <record id="view_category_form_inherit_branom_payment" model="ir.ui.view">
+	<field name="name">view.category.form.inherit.branom.payment</field>
+	<field name="model">product.category</field>
+	<field name="inherit_id" ref="product.product_category_form_view"/>
+	<field name="arch" type="xml">
+	  <group name="first" position="inside">
+	    <field name="exclude_discount"/>
+	  </group>  
+	</field>
+      </record>
+
     </data>
 </odoo>

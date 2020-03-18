@@ -37,53 +37,15 @@ class AccountInvoice(models.Model):
         self.amount_discounted_company_signed = amount_discounted_company * sign
         self.amount_undiscounted_company_signed = amount_undiscounted_company * sign                                                                                        
         self.amount_discounted_signed = discounted * sign
-        self.amount_undiscounted_signed = undiscounted * sign
-            
-    # @api.one
-    # @api.depends(
-    #     'type', 'state', 'currency_id', 'invoice_line_ids.price_subtotal',
-    #     'move_id.line_ids.debit',
-    #     'move_id.line_ids.credit',
-    #     'move_id.line_ids.currency_id',
-    #     'move_id.line_ids.exclude_discount')
-    # def _compute_amount_with_discount(self):
-    #     amount_discounted = 0.0
-    #     amount_discounted_company = 0.0
-    #     amount_undiscounted = 0.0
-    #     amount_undiscounted_company = 0.0
-    #     sign = self.type in ['in_refund', 'out_refund'] and -1 or 1
-
-    #     for line in self._get_pml_for_amount_residual():
-    #         amount_company = self._get_amount_from_move_line(line)
-    #         currency = line.currency_id or self.currency_id
-    #         amount = line.company_id.currency_id._convert(amount_company, currency, line.company_id, line.date or fields.Date.today())
-            
-    #         if line.exclude_discount:
-    #             amount_undiscounted_company += amount_company
-    #             amount_undiscounted += amount
-    #         else:
-    #             amount_discounted_company += amount_company
-    #             amount_discounted += amount
-
-    #     self.amount_undiscounted_company_signed = abs(amount_undiscounted_company) * sign
-    #     self.amount_undiscounted_signed = abs(amount_undiscounted) * sign
-    #     self.amount_discounted_company_signed = abs(amount_discounted_company) * sign
-    #     self.amount_discounted_signed = abs(amount_discounted) * sign
-
-    # @api.multi
-    # def finalize_invoice_move_lines(self, move_lines):
-    #     res = super(AccountInvoice, self).finalize_invoice_move_lines(move_lines)
-    #     for (_, _, vals) in res:
-    #         product_id = vals.get('product_id')
-    #         if product_id:
-    #             product = self.env['product.product'].browse(product_id)
-    #             if product:
-    #                 vals.update({'exclude_discount': product.exclude_discount})        
-    #     return res
+        self.amount_undiscounted_signed = undiscounted * sign            
 
     
 class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
-    exclude_discount = fields.Boolean(related='product_id.exclude_discount', readonly=True)
+    exclude_discount = fields.Boolean(compute="_compute_exclude_discount", store=True, readonly=True)
 
+    @api.depends('product_id', 'product_id.exclude_discount', 'product_id.categ_id', 'product_id.categ_id.exclude_discount')
+    def _compute_exclude_discount(self):
+        for line in self:
+            line.exclude_discount = line.product_id.exclude_discount or line.product_id.categ_id.exclude_discount if line.product_id else False
