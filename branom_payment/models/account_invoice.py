@@ -43,9 +43,20 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
-    exclude_discount = fields.Boolean(compute="_compute_exclude_discount", store=True, readonly=True)
+    exclude_discount = fields.Boolean(compute=False, store=True, readonly=False)
 
-    @api.depends('product_id', 'product_id.exclude_discount', 'product_id.categ_id', 'product_id.categ_id.exclude_discount')
-    def _compute_exclude_discount(self):
-        for line in self:
-            line.exclude_discount = line.product_id.exclude_discount or line.product_id.categ_id.exclude_discount if line.product_id else False
+    @api.model
+    def create(self, vals):
+        rids = super(AccountInvoiceLine, self).create(vals)
+        for rid in rids:
+            rid._onchange_product_id()
+        return rids
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        vals = super(AccountInvoiceLine, self)._onchange_product_id()
+        if self.product_id:
+            self.exclude_discount = self.product_id.exclude_discount or (self.product_id.categ_id and self.product_id.categ_id.exclude_discount) or False
+        else:
+            self.excluse_discount = False
+        return vals
