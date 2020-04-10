@@ -15,10 +15,14 @@ class ProductProduct(models.Model):
         prefix, suffix = '', ''
 
         for attr_val in self.attribute_value_ids.sorted(key=lambda r: r.position):
+            separator = attr_val.separator or ''
+            separator.replace(' ', '')
+            if separator.lower() == 'space':
+                separator = ' '
             if attr_val.affix_type == 'prefix':
-                prefix += attr_val.manufacture_code + attr_val.separator
+                prefix += attr_val.manufacture_code + separator
             elif attr_val.affix_type == 'suffix':
-                suffix += attr_val.separator + attr_val.manufacture_code
+                suffix += separator + attr_val.manufacture_code
         return prefix + code + suffix
 
     @api.model_create_multi
@@ -30,15 +34,13 @@ class ProductProduct(models.Model):
 
             # Only allow creation of vendor pricelist/product if ONE vendor present per product
             if len(vendor_ids) == 1:
-                self.env['product.supplierinfo'].create([{
+                pricelist = self.env['product.supplierinfo'].create([{
                     'name': vendor_ids[0].id,
                     'product_tmpl_id': prod.product_tmpl_id.id,
                     'product_id': prod.id,
                 }])
-            # else:
-            #     raise UserError(
-            #         _('Product\'s Vendor Pricelist cannot have zero or more than one Vendor(s).\n')
-            #     )
+                # override price and set it to price with extra cost
+                pricelist.price = pricelist.price_with_extra
 
             # only create code if has attr_values
             if prod.attribute_value_ids:
@@ -52,7 +54,7 @@ class ProductTemplate(models.Model):
     base_standard_price = fields.Float(string='Base Cost', company_dependent=True,
                                        digits=dp.get_precision('Product Price'),
                                        default=0.0,
-                                       help='Cost used to compute the Vendor Price list with Extra Cost from Variants',
+                                       help='Cost used to compute the Vendor Price list with Cost Extra from Variants',
                                        groups='base.group_user', store=True)
 
     base_default_code = fields.Char(string='Base Internal Reference',
@@ -71,16 +73,16 @@ class SupplierInfo(models.Model):
     _inherit = 'product.supplierinfo'
 
     cost_extra = fields.Float(
-        string='Variant Extra Cost',
+        string='Variant Cost Extra',
         compute='_compute_product_cost_extra',
         digits=dp.get_precision('Product Price'),
         default=0.0,
-        help='The extra cost of this variant based on attribute value\'s cost_extra.',
+        help='The cost extra of this variant based on attribute value\'s cost_extra.',
         store=True,
     )
 
     price_with_extra = fields.Float(
-        string='Price with Extra Cost',
+        string='Price with Cost Extra',
         digits=dp.get_precision('Product Price'),
         help='The cost of this variant based on its product variant cost and its attribute values cost_extra.',
         compute='_compute_cost_variant',
@@ -95,7 +97,7 @@ class SupplierInfo(models.Model):
         for vendor_list in self.filtered(lambda v: v.product_id and v.product_id.attribute_value_ids):
             vendor_list.cost_extra = sum(vendor_list.product_id.attribute_value_ids.mapped('cost_extra'))
 
-    # Compute the total extra cost, includes: product.template's base_standard_price + product.supplierinfo's cost_extra
+    # Compute the total cost extra, includes: product.template's base_standard_price + product.supplierinfo's cost_extra
     # @api.depends('product_tmpl_id', 'product_tmpl_id.base_standard_price', 'cost_extra')
     @api.depends('product_tmpl_id', 'cost_extra')
     def _compute_cost_variant(self):

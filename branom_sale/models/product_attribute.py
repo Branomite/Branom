@@ -13,7 +13,7 @@ class ProductAttributeValue(models.Model):
                                   selection=[('prefix', 'Prefix'),
                                              ('suffix', 'Suffix')])
 
-    cost_extra = fields.Float(string='Attribute Extra Cost', default=0.0,
+    cost_extra = fields.Float(string='Attribute Cost Extra', default=0.0,
                               digits=dp.get_precision('Product Price'),
-                              help='Extra Cost: Extra cost for the variant with this attribute value on sale price. '
+                              help='Cost Extra: Cost Extra for the variant with this attribute value on sale price. '
                                    'eg. 200 cost extra, 1000 + 200 = 1200.')
