@@ -8,10 +8,8 @@
             <xpath expr="//field[@name='list_price']" position="after">
                 <field name="standard_price"/>
                 <field name="base_standard_price" widget="monetary"/>
-                <field name="default_code"/>
                 <field name="base_default_code"/>
             </xpath>
-
         </field>
     </record>
 

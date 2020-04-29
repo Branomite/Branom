@@ -57,8 +57,11 @@ class ProductTemplate(models.Model):
                                        help='Cost used to compute the Vendor Price list with Cost Extra from Variants',
                                        groups='base.group_user', store=True)
 
-    base_default_code = fields.Char(string='Base Internal Reference',
-                                    help='Base Internal Reference for computing Auto-Generated Manufacturing Code')
+    base_default_code = fields.Char(string='Base Manufacturer Product Code',
+                                    help='Base Manufacturer Product Code for computing Auto-Generated Manufacturing '
+                                         'Code')
+
+    product_image_ids = fields.One2many('product.image', 'product_tmpl_id', string='Images', copy=True)
 
     @api.multi
     def write(self, vals):

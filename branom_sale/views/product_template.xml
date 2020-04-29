@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_backend_branom" inherit_id="sale.assets_backend_inherit_sale" name="Configurator Extended">
+        <xpath expr="script[last()]" position="after">
+            <script type="text/javascript" src="/branom_sale/static/src/js/product_config.js"/>
+        </xpath>
+    </template>
+
+    <template id="product_variants_branom" inherit_id="sale.variants">
+        <xpath expr="//li[@t-att-data-attribute_id='variant_id.attribute_id.id']" position="attributes">
+            <attribute name="t-attf-class">variant_attribute #{'d-none' if len(variant_id.product_template_value_ids) == 1 and variant_id.attribute_id.is_show_one and not variant_id.product_template_value_ids[0].is_custom else ''}</attribute>
+        </xpath>
+    </template>
+</odoo>
