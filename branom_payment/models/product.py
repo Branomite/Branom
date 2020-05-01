@@ -10,8 +10,8 @@ class ProductTemplate(models.Model):
     exclude_discount = fields.Boolean(string='Excluded from Discount', help="When set to true, this product will be excluded from payment term discount on invoice.")
 
 
-class ProductCategory(models.Model):
-    _inherit = "product.category"
+# class ProductCategory(models.Model):
+#     _inherit = "product.category"
 
-    exclude_discount = fields.Boolean(string='Excluded from Discount', help="When set to true, product from this category will be excluded from payment term discount on invoice.")
+#     exclude_discount = fields.Boolean(string='Excluded from Discount', help="When set to true, product from this category will be excluded from payment term discount on invoice.")
 

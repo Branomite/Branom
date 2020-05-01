@@ -43,7 +43,7 @@ class AccountInvoice(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.invoice.line"
 
-    exclude_discount = fields.Boolean(compute=False, store=True, readonly=False)
+    exclude_discount = fields.Boolean('Exclude Discount')
 
     @api.model
     def create(self, vals):
@@ -55,8 +55,5 @@ class AccountInvoiceLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         vals = super(AccountInvoiceLine, self)._onchange_product_id()
-        if self.product_id:
-            self.exclude_discount = self.product_id.exclude_discount or (self.product_id.categ_id and self.product_id.categ_id.exclude_discount) or False
-        else:
-            self.excluse_discount = False
+        self.exclude_discount = self.product_id.exclude_discount  # not using compute so that we only pull this info once
         return vals
