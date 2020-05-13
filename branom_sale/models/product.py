@@ -63,12 +63,50 @@ class ProductTemplate(models.Model):
 
     product_image_ids = fields.One2many('product.image', 'product_tmpl_id', string='Images', copy=True)
 
+    attribute_line_ids = fields.One2many('product.template.attribute.line', 'product_tmpl_id',
+                                         'Product Attributes', copy=True)
+
+    # prod_tmpl_attr_value_ids = fields.One2many(comodel_name='product.template.attribute.value',
+    #                                            inverse_name='product_tmpl_id',
+    #                                            string='Product Template Attributes Values')
+
+    prod_tmpl_attr_ex_ids = fields.One2many(comodel_name='product.template.attribute.exclusion',
+                                            inverse_name='product_tmpl_id',
+                                            string='Product Template Attributes Exclusions')
+
     @api.multi
     def write(self, vals):
         res = super(ProductTemplate, self).write(vals)
         for tmpl in self.filtered(lambda t: len(t.product_variant_ids) == 1):
             prod = tmpl.product_variant_id
             prod.default_code = prod.generate_extra_code()
+        return res
+
+    @api.multi
+    def copy(self, default=None):
+        res = super(ProductTemplate, self).copy(default)
+
+        # We need to create new exclusions that map the correct product.template.attribute.values
+        # from the original copied prod.tmpl
+        ptav = self.env['product.template.attribute.value']
+        for prod in res:
+            new_ex = []
+            for ex in self.prod_tmpl_attr_ex_ids:
+                ex_main_attr = ptav.search([('product_tmpl_id', '=', prod.id),
+                                            ('product_attribute_value_id', '=',
+                                             ex.product_template_attribute_value_id.product_attribute_value_id.id)],
+                                           limit=1).id
+
+                ex_values = ptav.search([('product_tmpl_id', '=', prod.id),
+                                         ('product_attribute_value_id', 'in',
+                                          ex.mapped('value_ids.product_attribute_value_id').ids)]).ids
+                cur_ex = {
+                    'product_template_attribute_value_id': ex_main_attr,
+                    'product_tmpl_id': prod.id,
+                    'value_ids': [(6, 0, ex_values)],
+                }
+                new_ex.append(cur_ex)
+            self.env['product.template.attribute.exclusion'].with_context(lang=None).create(new_ex)
         return res
 
 
@@ -109,4 +147,3 @@ class SupplierInfo(models.Model):
                 vendor_list.price_with_extra = vendor_list.product_tmpl_id.base_standard_price + vendor_list.cost_extra
                 # Automatically set the price on vendor pricelist
                 vendor_list.price = vendor_list.price_with_extra
-

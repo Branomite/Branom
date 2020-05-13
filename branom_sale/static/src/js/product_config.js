@@ -48,11 +48,13 @@ var ProductConfiguratorFormRendererBranom = ProductConfiguratorFormRenderer.incl
                     restoreOptions($(this), +$(el).val());
                 });
             });
-
+            //Handle radio button with hide/show
+            $('input').parent().parent().show();
             for (var val of values) {
                 var hide = product_exclusions[val]
                 for (var h of hide) {
                     $('option[value="'+ h +'"]').remove();
+                    $('input[value="'+ h +'"]').parent().parent().hide();
                 }
             }
         } // End hide_excluded_products
