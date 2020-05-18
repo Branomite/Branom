@@ -49,7 +49,7 @@ class AccountInvoiceLine(models.Model):
     def create(self, vals):
         rids = super(AccountInvoiceLine, self).create(vals)
         for rid in rids:
-            rid._onchange_product_id()
+            rid.exclude_discount = rid.product_id.exclude_discount  # cannot call onchange product id since it will pull the original price for products
         return rids
 
     @api.onchange('product_id')
