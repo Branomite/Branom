@@ -63,3 +63,15 @@ class SaleOrderLine(models.Model):
             line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount']/100.0))
             line['discount'] = 0.0
         return res
+
+    @api.model_create_multi
+    def create(self, vals):
+        res = super(SaleOrderLine, self).create(vals)
+        for line in res:
+            prod_id = line.product_id
+            new_description = "[" + prod_id.code + "] " + prod_id.name + "\n"
+            for attr_val in prod_id.attribute_value_ids:
+                new_description = new_description + attr_val.manufacture_code + ": " \
+                                  + attr_val.attribute_id.name + " - " + attr_val.name + "\n"
+        res.name = new_description
+        return res
