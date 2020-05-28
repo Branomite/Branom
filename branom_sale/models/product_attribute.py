@@ -39,7 +39,3 @@ class ProductTemplateAttributeValue(models.Model):
             other values of the product or some attribute values of optional and accessory products.""",
         copy=True)
 
-    @api.multi
-    def copy_data(self, default=None):
-        print("TEST INSIDE COPY DATA, ptav")
-        return super(ProductTemplateAttributeValue, self).copy_data(default)

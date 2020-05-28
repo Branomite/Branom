@@ -66,10 +66,6 @@ class ProductTemplate(models.Model):
     attribute_line_ids = fields.One2many('product.template.attribute.line', 'product_tmpl_id',
                                          'Product Attributes', copy=True)
 
-    # prod_tmpl_attr_value_ids = fields.One2many(comodel_name='product.template.attribute.value',
-    #                                            inverse_name='product_tmpl_id',
-    #                                            string='Product Template Attributes Values')
-
     prod_tmpl_attr_ex_ids = fields.One2many(comodel_name='product.template.attribute.exclusion',
                                             inverse_name='product_tmpl_id',
                                             string='Product Template Attributes Exclusions')

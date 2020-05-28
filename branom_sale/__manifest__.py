@@ -60,6 +60,7 @@
     'website': "http://www.odoo.com",
     'category': 'Custom Development',
     'version': '0.1',
+    'license': 'OEEL-1',
 
     # any module necessary for this one to work correctly
     'depends': ['account', 'product', 'sale_account_taxcloud', 'website_sale'],
