@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_update_manufacture_code_branom" model="ir.actions.server">
+            <field name="name">Update Auto-Generation Manufacturer Code</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="product.model_product_attribute_value"/>
+            <field name="binding_model_id" ref="product.model_product_attribute_value"/>
+            <field name="state">code</field>
+            <field name="code">
+attr_val_ids = env['product.attribute.value'].search([('write_date', '>', (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S'))])
+prod_ids = env['product.product'].search([('attribute_value_ids', 'in', attr_val_ids.ids)])
+for p in prod_ids:
+  p['default_code'] = p.generate_extra_code()
+            </field>
+        </record>
+    </data>
+</odoo>
