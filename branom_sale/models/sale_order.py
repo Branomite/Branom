@@ -69,9 +69,13 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self).create(vals)
         for line in res:
             prod_id = line.product_id
-            new_description = "[" + prod_id.code + "] " + prod_id.name + "\n"
+            if prod_id.code:
+                new_description = "[" + prod_id.code + "] " + prod_id.name + "\n"
+            else:
+                new_description = prod_id.name + "\n"
             for attr_val in prod_id.attribute_value_ids:
-                new_description = new_description + attr_val.manufacture_code + ": " \
-                                  + attr_val.attribute_id.name + " - " + attr_val.name + "\n"
+                mc_code = attr_val.manufacture_code or ''
+                new_description = new_description + mc_code + ": " + attr_val.attribute_id.name \
+                                  + " - " + attr_val.name + "\n"
         res.name = new_description
         return res
