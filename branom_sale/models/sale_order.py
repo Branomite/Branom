@@ -67,7 +67,7 @@ class SaleOrderLine(models.Model):
     @api.model_create_multi
     def create(self, vals):
         res = super(SaleOrderLine, self).create(vals)
-        for line in res:
+        for line in res.filtered(lambda l: l.display_type != 'line_section' and l.display_type != 'line_note'):
             prod_id = line.product_id
             if prod_id.code:
                 new_description = "[" + prod_id.code + "] " + prod_id.name + "\n"
@@ -77,5 +77,5 @@ class SaleOrderLine(models.Model):
                 mc_code = attr_val.manufacture_code or ''
                 new_description = new_description + mc_code + ": " + attr_val.attribute_id.name \
                                   + " - " + attr_val.name + "\n"
-        res.name = new_description
+            line.name = new_description
         return res
