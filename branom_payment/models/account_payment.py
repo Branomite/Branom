@@ -102,8 +102,7 @@ class AccountPayment(models.Model):
             payment.refund_invoice_ids = payment.invoice_ids.mapped('refund_invoice_ids') if payment.invoice_ids else False
 
     def _set_refund_invoice_ids(self):
-        for payment in self:
-            pass
+        pass
             
     def _create_payment_entry(self, amount):
         res = super(AccountPayment, self)._create_payment_entry(amount)
