@@ -94,12 +94,16 @@ class AccountAbstractPayment(models.AbstractModel):
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    refund_invoice_ids = fields.Many2many(comodel_name='account.invoice', string='Credit Notes', compute='_compute_refund_invoice_ids', store=True)
+    refund_invoice_ids = fields.Many2many(comodel_name='account.invoice', string='Credit Notes', compute='_compute_refund_invoice_ids', inverse='_set_refund_invoice_ids', store=True, reaonly=False)
 
     @api.depends('invoice_ids', 'invoice_ids.refund_invoice_ids')
     def _compute_refund_invoice_ids(self):
         for payment in self:
             payment.refund_invoice_ids = payment.invoice_ids.mapped('refund_invoice_ids') if payment.invoice_ids else False
+
+    def _set_refund_invoice_ids(self):
+        for payment in self:
+            pass
             
     def _create_payment_entry(self, amount):
         res = super(AccountPayment, self)._create_payment_entry(amount)
