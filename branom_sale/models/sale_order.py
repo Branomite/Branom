@@ -66,7 +66,7 @@ class SaleOrderLine(models.Model):
 
     def get_sale_order_line_multiline_description_sale(self, product):
         if not product.attribute_value_ids:
-            res = super(SaleOrderLine, self).get_product_custom_attribute_value_idssale_order_line_multiline_description_sale(product)
+            res = super(SaleOrderLine, self).get_sale_order_line_multiline_description_sale(product)
         else:
             if product.code:
                 new_description = "[" + product.code + "] " + product.name + "\n"
