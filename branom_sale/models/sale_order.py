@@ -64,18 +64,16 @@ class SaleOrderLine(models.Model):
             line['discount'] = 0.0
         return res
 
-    @api.model_create_multi
-    def create(self, vals):
-        res = super(SaleOrderLine, self).create(vals)
-        for line in res.filtered(lambda l: l.display_type != 'line_section' and l.display_type != 'line_note'):
-            prod_id = line.product_id
-            if prod_id.code:
-                new_description = "[" + prod_id.code + "] " + prod_id.name + "\n"
+    def get_sale_order_line_multiline_description_sale(self, product):
+        if not product.attribute_value_ids:
+            res = super(SaleOrderLine, self).get_product_custom_attribute_value_idssale_order_line_multiline_description_sale(product)
+        else:
+            if product.code:
+                new_description = "[" + product.code + "] " + product.name + "\n"
             else:
-                new_description = prod_id.name + "\n"
-            for attr_val in prod_id.attribute_value_ids:
+                new_description = product.name + "\n"
+            for attr_val in product.attribute_value_ids:
                 mc_code = attr_val.manufacture_code or ''
-                new_description = new_description + mc_code + ": " + attr_val.attribute_id.name \
-                                  + " - " + attr_val.name + "\n"
-            line.name = new_description
+                new_description = new_description + mc_code + ": " + attr_val.attribute_id.name + " - " + attr_val.name + "\n"
+            res = new_description
         return res
