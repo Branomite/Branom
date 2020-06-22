@@ -9,7 +9,7 @@ class SaleOrder(models.Model):
     sales_type = fields.Selection([
         ('commission', 'Commission Sale'),
         ('regular', 'Non-Commission Sale'),
-        ], string="Sales Type")
+    ], string="Sales Type")
 
     @api.multi
     def action_confirm(self):
@@ -60,7 +60,7 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self).invoice_line_create_vals(invoice_id, qty)
         for line in res:
             # Take the unit_price and subtract the discount amount, set as new invoice unit price.
-            line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount']/100.0))
+            line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount'] / 100.0))
             line['discount'] = 0.0
         return res
 
@@ -72,8 +72,16 @@ class SaleOrderLine(models.Model):
                 new_description = "[" + product.code + "] " + product.name + "\n"
             else:
                 new_description = product.name + "\n"
+
             for attr_val in product.attribute_value_ids:
                 mc_code = attr_val.manufacture_code or ''
-                new_description = new_description + mc_code + ": " + attr_val.attribute_id.name + " - " + attr_val.name + "\n"
+                custom_val = self.product_custom_attribute_value_ids.filtered(lambda c: c.attribute_value_id == attr_val).custom_value
+
+                new_description = new_description + mc_code + ": " + attr_val.attribute_id.name + " - " + attr_val.name
+                # Handle custom value in desc
+                if custom_val:
+                    new_description = new_description + ((": " + custom_val) or '').strip() + "\n"
+                else:
+                    new_description = new_description + "\n"
             res = new_description
         return res
