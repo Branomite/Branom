@@ -1,7 +1,7 @@
 odoo.define('branom_sale.ProductConfiguratorFormRendererBranom', function (require) {
 'use strict';
 
-var ProductConfiguratorFormRenderer = require('sale.ProductConfiguratorFormRenderer');
+    var ProductConfiguratorFormRenderer = require('sale_product_configurator.ProductConfiguratorFormRenderer');
 
 var ProductConfiguratorFormRendererBranom = ProductConfiguratorFormRenderer.include({
     /**

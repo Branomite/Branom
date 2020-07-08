@@ -14,21 +14,30 @@ class AccountMove(models.Model):
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
 
-    def finalize_invoice_move_lines(self, move_lines):
-        res = super(AccountMove, self).finalize_invoice_move_lines(move_lines)
-        # Zero out the JE if the SO is commission type
-        if self.invoice_line_ids.mapped('sale_line_ids.order_id').sales_type == 'commission':
-            zero_ml = []
-            for move in res:
-                if self.env['account.account'].browse(move[2]['account_id']).is_zero_comm:
-                    temp_dict = move[2]
-                    temp_dict['credit'] = False
-                    temp_dict['debit'] = False
-                    zero_ml.append(move[:2]+(temp_dict,))
-                else:
-                    zero_ml.append(move)
-            return zero_ml
-        return res
+    # def finalize_invoice_move_lines(self, move_lines):
+    #     res = super(AccountInvoice, self).finalize_invoice_move_lines(move_lines)
+    #     # Zero out the JE if the SO is commission type
+    #     if self.invoice_line_ids.mapped('sale_line_ids.order_id').sales_type == 'commission':
+    #         zero_ml = []
+    #         for move in res:
+    #             if self.env['account.account'].browse(move[2]['account_id']).is_zero_comm:
+    #                 temp_dict = move[2]
+    #                 temp_dict['credit'] = False
+    #                 temp_dict['debit'] = False
+    #                 zero_ml.append(move[:2]+(temp_dict,))
+    #             else:
+    #                 zero_ml.append(move)
+    #         return zero_ml
+    #     return res
+
+    def post(self):
+        move_lines = self.line_ids.filtered(lambda l: l.mapped('sale_line_ids.order_id').sales_type)
+        if move_lines:
+            self.line_ids.write({
+                'credit': False,
+                'debit': False
+            })
+        return super(AccountMove, self).post()
 
     @api.onchange('pricelist_id', 'invoice_line_ids')
     def apply_pricelist(self):

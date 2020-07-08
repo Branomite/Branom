@@ -51,17 +51,24 @@ class SaleOrderLine(models.Model):
                 return super(SaleOrderLine, self)._action_launch_stock_rule(previous_product_uom_qty=previous_product_uom_qty)
         return True
 
-    # TODO invoice_line_create_vals doesn't exist in 13
-    def invoice_line_create_vals(self, invoice_id, qty):
-        res = super(SaleOrderLine, self).invoice_line_create_vals(invoice_id, qty)
-        for line in res:
-            # Take the unit_price and subtract the discount amount, set as new invoice unit price.
-            line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount'] / 100.0))
-            line['discount'] = 0.0
-        return res
+    # deprecated in v13
+    # def invoice_line_create_vals(self, invoice_id, qty):
+    #     res = super(SaleOrderLine, self).invoice_line_create_vals(invoice_id, qty)
+    #     for line in res:
+    #         # Take the unit_price and subtract the discount amount, set as new invoice unit price.
+    #         line['price_unit'] = line['price_unit'] - (line['price_unit'] * (line['discount'] / 100.0))
+    #         line['discount'] = 0.0
+    #     return res
+
+    def _prepare_invoice_line(self):
+        res = super(SaleOrderLine, self)._prepare_invoice_line()
+        # Take the unit_price and subtract the discount amount, set as new invoice unit price.
+        res['price_unit'] = res['price_unit'] - \
+            (res['price_unit'] * (res['discount'] / 100.0))
+        res['discount'] = 0.0
 
     def get_sale_order_line_multiline_description_sale(self, product):
-        if not product.product_template_attribute_value_ids:
+        if not product.attribute_line_ids.value_ids:
             res = super(SaleOrderLine, self).get_sale_order_line_multiline_description_sale(product)
         else:
             if product.code:
