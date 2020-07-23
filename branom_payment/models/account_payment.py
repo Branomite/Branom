@@ -117,6 +117,6 @@ class AccountPayment(models.Model):
             total = sum(self.invoice_ids.mapped('amount_discounted_signed'))
             for invoice in self.invoice_ids:
                 invoice.write({
-                    'payment_difference': self.payment_difference * (invoice.amount_total / total)
+                    'payment_difference': self.payment_difference * (invoice.amount_discounted_signed / total)
                 })
         return res
