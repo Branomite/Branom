@@ -41,7 +41,7 @@ class AccountAbstractPayment(models.AbstractModel):
     def _compute_payment_amount(self, invoices=None, currency=None, with_discount=True):
         if not with_discount:
             return super(AccountAbstractPayment, self)._compute_payment_amount(invoices=invoices, currency=currency)
-        
+
         # Get the payment invoices
         if not invoices:
             invoices = self.invoice_ids
@@ -82,7 +82,7 @@ class AccountAbstractPayment(models.AbstractModel):
                     self.payment_date or fields.Date.today()
                 )
         return total
-        
+
     @api.depends('invoice_ids', 'amount', 'payment_date', 'currency_id')
     def _compute_payment_difference(self):
         super(AccountAbstractPayment, self)._compute_payment_difference()
@@ -90,7 +90,7 @@ class AccountAbstractPayment(models.AbstractModel):
             payment_amount = -pay.amount if pay.payment_type == 'outbound' else pay.amount
             pay.payment_difference = pay._compute_payment_amount(with_discount=False) - payment_amount
 
-    
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
@@ -110,14 +110,13 @@ class AccountPayment(models.Model):
 
     def _set_refund_invoice_ids(self):
         pass
-            
+
     def _create_payment_entry(self, amount):
         res = super(AccountPayment, self)._create_payment_entry(amount)
         if self.payment_difference_handling == 'reconcile' and self.payment_difference:
-            total = sum(self.invoice_ids.mapped('amount_total'))
+            total = sum(self.invoice_ids.mapped('amount_discounted_signed'))
             for invoice in self.invoice_ids:
                 invoice.write({
                     'payment_difference': self.payment_difference * (invoice.amount_total / total)
                 })
         return res
-    
