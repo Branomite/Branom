@@ -41,7 +41,7 @@ class AccountAbstractPayment(models.AbstractModel):
     def _compute_payment_amount(self, invoices=None, currency=None, with_discount=True):
         if not with_discount:
             return super(AccountAbstractPayment, self)._compute_payment_amount(invoices=invoices, currency=currency)
-        
+
         # Get the payment invoices
         if not invoices:
             invoices = self.invoice_ids
@@ -82,7 +82,7 @@ class AccountAbstractPayment(models.AbstractModel):
                     self.payment_date or fields.Date.today()
                 )
         return total
-        
+
     @api.depends('invoice_ids', 'amount', 'payment_date', 'currency_id')
     def _compute_payment_difference(self):
         super(AccountAbstractPayment, self)._compute_payment_difference()
@@ -90,27 +90,33 @@ class AccountAbstractPayment(models.AbstractModel):
             payment_amount = -pay.amount if pay.payment_type == 'outbound' else pay.amount
             pay.payment_difference = pay._compute_payment_amount(with_discount=False) - payment_amount
 
-    
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    refund_invoice_ids = fields.Many2many(comodel_name='account.invoice', string='Credit Notes', compute='_compute_refund_invoice_ids', inverse='_set_refund_invoice_ids', store=True, reaonly=False)
+    refund_invoice_ids = fields.Many2many(comodel_name='account.invoice', string='Credit Notes', compute='_compute_refund_invoice_ids', inverse='_set_refund_invoice_ids', store=True, readonly=False)
 
-    @api.depends('invoice_ids', 'invoice_ids.refund_invoice_ids')
+    @api.depends('invoice_ids', 'invoice_ids.payment_move_line_ids', 'invoice_ids.payment_move_line_ids.invoice_id')
     def _compute_refund_invoice_ids(self):
         for payment in self:
-            payment.refund_invoice_ids = payment.invoice_ids.mapped('refund_invoice_ids') if payment.invoice_ids else False
+            payment.refund_invoice_ids = self.env['account.invoice']
+            # payment.refund_invoice_ids = payment.invoice_ids.mapped('refund_invoice_ids') if payment.invoice_ids else False
+            for invoice in payment.invoice_ids:
+                payment_vals = invoice._get_payments_vals()
+                for payment_val in payment_vals:  # account.move.line
+                    pml = self.env['account.move.line'].browse(payment_val.get('payment_id'))
+                    if pml.invoice_id:
+                        payment.refund_invoice_ids |= pml.invoice_id
 
     def _set_refund_invoice_ids(self):
         pass
-            
+
     def _create_payment_entry(self, amount):
         res = super(AccountPayment, self)._create_payment_entry(amount)
         if self.payment_difference_handling == 'reconcile' and self.payment_difference:
-            total = sum(self.invoice_ids.mapped('amount_total'))
+            total = sum(self.invoice_ids.mapped('amount_discounted_signed'))
             for invoice in self.invoice_ids:
                 invoice.write({
-                    'payment_difference': self.payment_difference * (invoice.amount_total / total)
+                    'payment_difference': self.payment_difference * (invoice.amount_discounted_signed / total)
                 })
         return res
-    
