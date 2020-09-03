@@ -75,6 +75,6 @@ class AccountInvoiceLine(models.Model):
     @api.model
     def create(self, vals):
         res = super(AccountInvoiceLine, self).create(vals)
-        if res.sale_line_ids.filtered(lambda s: s.order_id.sales_type == 'commission') and res.company_id.commission_account_id:
+        if res.sale_line_ids.filtered(lambda s: s.order_id.sales_type == 'commission') and res.company_id.commission_account_id and not res.display_type:
             res.account_id = res.company_id.commission_account_id
         return res
