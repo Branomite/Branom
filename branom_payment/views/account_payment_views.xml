@@ -21,7 +21,8 @@
 		  <tree>
 		    <field name="display_name"/>
 		    <field name="amount_total"/>
-		    <field name="residual"/>
+              <!-- TODO Missing field "residual" on `account.payment` in Odoo 13.0 -->
+<!--		    <field name="residual"/>-->
 		  </tree>
 		</field>
 	      </xpath>
