@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "Branom: Discounted Payment Values and Credits",
 

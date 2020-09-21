@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
-from odoo.tools import float_compare
-from itertools import groupby
-import odoo.addons.decimal_precision as dp
 
 
 MAP_INVOICE_TYPE_PARTNER_TYPE = {
@@ -25,7 +20,7 @@ MAP_INVOICE_TYPE_PAYMENT_SIGN = {
 class AccountPaymentTerm(models.Model):
     _inherit = "account.payment.term"
 
-    discount = fields.Float(string='Term Calculation', help='Discount on Invoice', digits=dp.get_precision('Discount'))
+    discount = fields.Float(string='Term Calculation', help='Discount on Invoice', digits='Discount')
 
     @api.constrains('discount')
     def _check_discount_range(self):
@@ -37,7 +32,6 @@ class AccountPaymentTerm(models.Model):
 class AccountAbstractPayment(models.AbstractModel):
     _inherit = 'account.abstract.payment'
 
-    @api.multi
     def _compute_payment_amount(self, invoices=None, currency=None, with_discount=True):
         if not with_discount:
             return super(AccountAbstractPayment, self)._compute_payment_amount(invoices=invoices, currency=currency)

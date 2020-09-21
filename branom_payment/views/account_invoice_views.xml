@@ -1,9 +1,10 @@
 <odoo>
     <data>
-        <record id="view_invoice_form_inherit_branom_payment" model="ir.ui.view">
-            <field name="name">invoice.form.inherit.branom.payment</field>
-            <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="account.invoice_form"/>
+        <!-- Note that Customer Invoice and Vendor Bills have the same base form view in 13 -->
+        <record id="view_move_form_inherit_branom_payment" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.branom.payment</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
 	      <xpath expr="//group[1]/group[1]" position="inside">
 		<field name="payment_difference"/>
@@ -14,18 +15,5 @@
             </field>
         </record>
 
-	<record id="view_invoice_supplier_form_inherit_branom_payment" model="ir.ui.view">
-            <field name="name">invoice.supplier.form.inherit.branom.payment</field>
-            <field name="model">account.invoice</field>
-            <field name="inherit_id" ref="account.invoice_supplier_form"/>
-            <field name="arch" type="xml">
-	      <xpath expr="//group[1]/group[1]" position="inside">
-		<field name="payment_difference"/>
-	      </xpath>
-	      <xpath expr="//field[@name='invoice_line_ids']/tree[1]/field[@name='name']" position="after">
-		<field name="exclude_discount"/>
-	      </xpath>
-            </field>
-        </record>
     </data>
 </odoo>
