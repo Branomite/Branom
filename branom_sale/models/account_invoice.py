@@ -45,7 +45,7 @@ class AccountMove(models.Model):
                 line.discount = 0.0
                 
                 product_context = dict(line.env.context, partner_id=self.partner_id.id,
-                                       date=self.date_invoice, uom=line.uom_id.id)
+                                       date=self.invoice_date, uom=line.uom_id.id)
                 # Must pass in SO Unit Price to keep unit price consistent when calculating the discount.
                 price, rule_id = self.pricelist_id.with_context(product_context).inv_get_product_price_rule(
                     line.product_id, line.quantity or 1.0, self.partner_id, line.price_unit)
@@ -60,7 +60,7 @@ class AccountMove(models.Model):
                         # which is in the SO's pricelist's currency
                         new_list_price = line.currency_id._convert(
                             new_list_price, self.pricelist_id.currency_id,
-                            self.company_id, self.date_invoice or fields.Date.today())
+                            self.company_id, self.invoice_date or fields.Date.today())
                     discount = ((new_list_price - price) / new_list_price) * 100.0
                     if (discount > 0.0 and new_list_price > 0.0) or (discount < 0.0 and new_list_price < 0.0):
                         line.discount = discount

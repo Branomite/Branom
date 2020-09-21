@@ -18,7 +18,7 @@ class AccountMove(models.Model):
         compute='_compute_amount_with_discount', store=True)
 
     @api.depends('invoice_line_ids.price_subtotal', 'invoice_line_ids.exclude_discount',
-                 'currency_id', 'company_id', 'date_invoice', 'type')
+                 'currency_id', 'company_id', 'invoice_date', 'type')
     def _compute_amount_with_discount(self):
         for move in self:
             # discounted here means to be discounted, sorry future devs
@@ -27,8 +27,8 @@ class AccountMove(models.Model):
             amount_discounted_company, amount_undiscounted_company = discounted, undiscounted
             if move.currency_id and move.company_id and move.currency_id != move.company_id.currency_id:
                 currency_id = move.currency_id
-                amount_discounted_company = currency_id._convert(discounted, move.company_id.currency_id, move.company_id, move.date_invoice or fields.Date.today())
-                amount_undiscounted_company = currency_id._convert(undiscounted, move.company_id.currency_id, move.company_id, move.date_invoice or fields.Date.today())
+                amount_discounted_company = currency_id._convert(discounted, move.company_id.currency_id, move.company_id, move.invoice_date or fields.Date.today())
+                amount_undiscounted_company = currency_id._convert(undiscounted, move.company_id.currency_id, move.company_id, move.invoice_date or fields.Date.today())
 
             sign = move.type in ['in_refund', 'out_refund'] and -1 or 1
             move.amount_discounted_company_signed = amount_discounted_company * sign
