@@ -32,7 +32,7 @@ class AccountPaymentTerm(models.Model):
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    refund_invoice_ids = fields.Many2many(comodel_name='account.invoice', string='Credit Notes', compute='_compute_refund_invoice_ids', inverse='_set_refund_invoice_ids', store=True, readonly=False)
+    refund_invoice_ids = fields.Many2many(comodel_name='account.move', string='Credit Notes', compute='_compute_refund_invoice_ids', inverse='_set_refund_invoice_ids', store=True, readonly=False)
 
     # Super implementation mismatch in version 13.0
     # def _compute_payment_amount(self, invoices, currency, journal, date):
@@ -89,17 +89,23 @@ class AccountPayment(models.Model):
             payment_amount = -pay.amount if pay.payment_type == 'outbound' else pay.amount
             pay.payment_difference = pay._compute_payment_amount(with_discount=False) - payment_amount
 
-    @api.depends('invoice_ids', 'invoice_ids.payment_move_line_ids', 'invoice_ids.payment_move_line_ids.invoice_id')
+    # TODO Incompatible @api.depends at 'payment_move_line_ids' on account.move in 13.0
+    # Additionally: invoice::(account.move?)._get_payments_vals() shouldn't be defined..
+    # @api.depends('invoice_ids', 'invoice_ids.payment_move_line_ids', 'invoice_ids.payment_move_line_ids.invoice_id')
+    @api.depends('invoice_ids')
     def _compute_refund_invoice_ids(self):
+        # original 12.0
+        # for payment in self:
+        #     payment.refund_invoice_ids = self.env['account.move']
+        #     # payment.refund_invoice_ids = payment.invoice_ids.mapped('refund_invoice_ids') if payment.invoice_ids else False
+        #     for invoice in payment.invoice_ids:
+        #         payment_vals = invoice._get_payments_vals()
+        #         for payment_val in payment_vals:  # account.move.line
+        #             pml = self.env['account.move.line'].browse(payment_val.get('payment_id'))
+        #             if pml.invoice_id:
+        #                 payment.refund_invoice_ids |= pml.invoice_id
         for payment in self:
-            payment.refund_invoice_ids = self.env['account.invoice']
-            # payment.refund_invoice_ids = payment.invoice_ids.mapped('refund_invoice_ids') if payment.invoice_ids else False
-            for invoice in payment.invoice_ids:
-                payment_vals = invoice._get_payments_vals()
-                for payment_val in payment_vals:  # account.move.line
-                    pml = self.env['account.move.line'].browse(payment_val.get('payment_id'))
-                    if pml.invoice_id:
-                        payment.refund_invoice_ids |= pml.invoice_id
+            payment.refund_invoice_ids = self.env['account.move']  # empty recordset default computation
 
     def _set_refund_invoice_ids(self):
         pass
