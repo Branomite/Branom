@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 
@@ -11,14 +9,13 @@ class AccountAccount(models.Model):
                                   help='Set True to allow this account to zero out the balances for Journal Entries.')
 
 
-class AccountInvoice(models.Model):
-    _inherit = 'account.invoice'
+class AccountMove(models.Model):
+    _inherit = 'account.move'
 
     pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
 
-    @api.multi
     def finalize_invoice_move_lines(self, move_lines):
-        res = super(AccountInvoice, self).finalize_invoice_move_lines(move_lines)
+        res = super(AccountMove, self).finalize_invoice_move_lines(move_lines)
         # Zero out the JE if the SO is commission type
         if self.invoice_line_ids.mapped('sale_line_ids.order_id').sales_type == 'commission':
             zero_ml = []
@@ -69,12 +66,12 @@ class AccountInvoice(models.Model):
                         line.discount = discount
 
 
-class AccountInvoiceLine(models.Model):
-    _inherit = 'account.invoice.line'
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
 
     @api.model
     def create(self, vals):
-        res = super(AccountInvoiceLine, self).create(vals)
+        res = super(AccountMoveLine, self).create(vals)
         if res.sale_line_ids.filtered(lambda s: s.order_id.sales_type == 'commission') and res.company_id.commission_account_id and not res.display_type:
             res.account_id = res.company_id.commission_account_id
         return res

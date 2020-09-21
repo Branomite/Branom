@@ -1,15 +1,9 @@
-# -*- coding: utf-8 -*-
-import time
 from odoo import models, fields, api, tools, _
-from odoo.exceptions import UserError, ValidationError
-from odoo.addons import decimal_precision as dp
-from odoo.tools.float_utils import float_compare, float_round
 
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    @api.multi
     def generate_extra_code(self):
         code = self.product_tmpl_id.base_default_code or ''
         prefix, suffix = '', ''
@@ -52,7 +46,7 @@ class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
     base_standard_price = fields.Float(string='Base Cost', company_dependent=True,
-                                       digits=dp.get_precision('Product Price'),
+                                       digits='Product Price',
                                        default=0.0,
                                        help='Cost used to compute the Vendor Price list with Cost Extra from Variants',
                                        groups='base.group_user', store=True)
@@ -70,7 +64,6 @@ class ProductTemplate(models.Model):
                                             inverse_name='product_tmpl_id',
                                             string='Product Template Attributes Exclusions')
 
-    @api.multi
     def write(self, vals):
         res = super(ProductTemplate, self).write(vals)
         for tmpl in self.filtered(lambda t: len(t.product_variant_ids) == 1):
@@ -78,7 +71,6 @@ class ProductTemplate(models.Model):
             prod.default_code = prod.generate_extra_code()
         return res
 
-    @api.multi
     def copy(self, default=None):
         res = super(ProductTemplate, self).copy(default)
 
@@ -112,7 +104,7 @@ class SupplierInfo(models.Model):
     cost_extra = fields.Float(
         string='Variant Cost Extra',
         compute='_compute_product_cost_extra',
-        digits=dp.get_precision('Product Price'),
+        digits='Product Price',
         default=0.0,
         help='The cost extra of this variant based on attribute value\'s cost_extra.',
         store=True,
@@ -120,7 +112,7 @@ class SupplierInfo(models.Model):
 
     price_with_extra = fields.Float(
         string='Price with Cost Extra',
-        digits=dp.get_precision('Product Price'),
+        digits='Product Price',
         help='The cost of this variant based on its product variant cost and its attribute values cost_extra.',
         compute='_compute_cost_variant',
         default=0.0,

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from odoo import models, fields, api
 
 
@@ -11,7 +9,6 @@ class SaleOrder(models.Model):
         ('regular', 'Non-Commission Sale'),
     ], string="Sales Type")
 
-    @api.multi
     def action_confirm(self):
         res = super(SaleOrder, self).action_confirm()
         for order in self.filtered(lambda o: o.state == 'sale' and o.sales_type == 'commission'):
@@ -24,7 +21,6 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
-    @api.multi
     def _action_launch_stock_rule(self):
         for line in self:
             if line.order_id.sales_type == 'commission':
@@ -55,7 +51,7 @@ class SaleOrderLine(models.Model):
                 return super(SaleOrderLine, self)._action_launch_stock_rule()
         return True
 
-    @api.multi
+    # TODO invoice_line_create_vals doesn't exist in 13
     def invoice_line_create_vals(self, invoice_id, qty):
         res = super(SaleOrderLine, self).invoice_line_create_vals(invoice_id, qty)
         for line in res:

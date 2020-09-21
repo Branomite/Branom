@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
-from odoo.addons import decimal_precision as dp
 
 
 class ProductAttributeValue(models.Model):
@@ -22,7 +20,7 @@ class ProductAttributeValue(models.Model):
                                              ('suffix', 'Suffix')])
 
     cost_extra = fields.Float(string='Attribute Cost Extra', default=0.0,
-                              digits=dp.get_precision('Product Price'),
+                              digits='Product Price',
                               help='Cost Extra: Cost Extra for the variant with this attribute value on sale price. '
                                    'eg. 200 cost extra, 1000 + 200 = 1200.')
 

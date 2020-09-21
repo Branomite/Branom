@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': "Branom: Sale Workflow Adjustment for Commission Sales",
 

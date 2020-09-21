@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from itertools import chain
 
 from odoo import models, fields, api, tools, _
@@ -18,7 +16,6 @@ class Pricelist(models.Model):
         Use New Unit price gathered from SO instead of getting the unit price from 
         the template.        
     """
-    @api.multi
     def _inv_compute_price_rule(self, products_qty_partner, price_unit, date=False, uom_id=False):
         """ Low-level method - Mono pricelist, multi products
         Returns: dict{product_id: (price, suitable_rule) for the given pricelist}
