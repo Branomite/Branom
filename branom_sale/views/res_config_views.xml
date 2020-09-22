@@ -6,7 +6,7 @@
             <field name="model">res.config.settings</field>
             <field name="inherit_id" ref="account.res_config_settings_view_form"/>
             <field name="arch" type="xml">
-                <div id="recommended_apps" position="after">
+                <xpath expr="//h2[last()]" position="before">
                     <h2 groups="account.group_account_user">Commission</h2>
                     <div class="row mt16 o_settings_container" id="account_commission_settings"
                          groups="account.group_account_user">
@@ -28,7 +28,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </xpath>
             </field>
         </record>
     </data>

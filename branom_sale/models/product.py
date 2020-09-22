@@ -120,11 +120,10 @@ class SupplierInfo(models.Model):
     )
 
     # Compute the cost extra: sum upp the cost_extra for each attribute value on product.product
-    # @api.depends('product_id', 'product_id.product_template_attribute_value_ids', 'product_id.product_template_attribute_value_ids.cost_extra')
-    @api.depends('product_id', 'product_id.attribute_value_ids')
+    @api.depends('product_id', 'product_id.product_template_attribute_value_ids.product_attribute_value_id.cost_extra')
     def _compute_product_cost_extra(self):
-        for vendor_list in self.filtered(lambda v: v.product_id and v.product_id.attribute_value_ids):
-            vendor_list.cost_extra = sum(vendor_list.product_id.attribute_value_ids.mapped('cost_extra'))
+        for vendor_list in self.filtered(lambda v: v.product_id and v.product_id.product_template_attribute_value_ids):
+            vendor_list.cost_extra = sum(vendor_list.product_id.product_template_attribute_value_ids.mapped('product_attribute_value_id.cost_extra'))
 
     # Compute the total cost extra, includes: product.template's base_standard_price + product.supplierinfo's cost_extra
     # @api.depends('product_tmpl_id', 'product_tmpl_id.base_standard_price', 'cost_extra')
