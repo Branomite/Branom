@@ -21,7 +21,7 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
-    def _action_launch_stock_rule(self):
+    def _action_launch_stock_rule(self, previous_product_uom_qty=False):
         for line in self:
             if line.order_id.sales_type == 'commission':
                 # Still need to create group_id in case it is used elsewhere
@@ -48,7 +48,7 @@ class SaleOrderLine(models.Model):
                 # Update the qty delivered to be same as ordered to trigger invoice creation
                 line.qty_delivered = line.product_uom_qty
             else:
-                return super(SaleOrderLine, self)._action_launch_stock_rule()
+                return super(SaleOrderLine, self)._action_launch_stock_rule(previous_product_uom_qty=previous_product_uom_qty)
         return True
 
     # TODO invoice_line_create_vals doesn't exist in 13
@@ -61,7 +61,7 @@ class SaleOrderLine(models.Model):
         return res
 
     def get_sale_order_line_multiline_description_sale(self, product):
-        if not product.attribute_value_ids:
+        if not product.product_template_attribute_value_ids:
             res = super(SaleOrderLine, self).get_sale_order_line_multiline_description_sale(product)
         else:
             if product.code:
@@ -69,7 +69,7 @@ class SaleOrderLine(models.Model):
             else:
                 new_description = product.name + "\n"
 
-            for attr_val in product.attribute_value_ids:
+            for attr_val in product.mapped('product_template_attribute_value_ids.product_attribute_value_id'):
                 mc_code = attr_val.manufacture_code or ''
                 custom_val = self.product_custom_attribute_value_ids.filtered(lambda c: c.attribute_value_id == attr_val).custom_value
 

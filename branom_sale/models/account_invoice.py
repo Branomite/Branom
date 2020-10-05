@@ -39,13 +39,13 @@ class AccountMove(models.Model):
                 )
 
             for line in inv.invoice_line_ids:
-                if not (line.product_id and line.uom_id and self.pricelist_id and
+                if not (line.product_id and line.product_uom_id and self.pricelist_id and
                         self.pricelist_id.discount_policy == 'without_discount'):
                     return
                 line.discount = 0.0
                 
                 product_context = dict(line.env.context, partner_id=self.partner_id.id,
-                                       date=self.invoice_date, uom=line.uom_id.id)
+                                       date=self.invoice_date, uom=line.product_uom_id.id)
                 # Must pass in SO Unit Price to keep unit price consistent when calculating the discount.
                 price, rule_id = self.pricelist_id.with_context(product_context).inv_get_product_price_rule(
                     line.product_id, line.quantity or 1.0, self.partner_id, line.price_unit)
@@ -69,9 +69,10 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    @api.model
-    def create(self, vals):
-        res = super(AccountMoveLine, self).create(vals)
-        if res.sale_line_ids.filtered(lambda s: s.order_id.sales_type == 'commission') and res.company_id.commission_account_id and not res.display_type:
-            res.account_id = res.company_id.commission_account_id
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super(AccountMoveLine, self).create(vals_list)
+        for line in res:
+            if line.sale_line_ids.filtered(lambda s: s.order_id.sales_type == 'commission') and line.company_id.commission_account_id and not line.display_type:
+                line.account_id = line.company_id.commission_account_id
         return res

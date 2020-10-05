@@ -9,7 +9,7 @@
             <field name="state">code</field>
             <field name="code">
 attr_val_ids = env['product.attribute.value'].search([('write_date', '>', (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S'))])
-prod_ids = env['product.product'].search([('attribute_value_ids', 'in', attr_val_ids.ids)])
+prod_ids = env['product.product'].search([('product_template_attribute_value_ids.product_attribute_value_id', 'in', attr_val_ids.ids)])
 for p in prod_ids:
   p['default_code'] = p.generate_extra_code()
             </field>

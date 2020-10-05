@@ -8,7 +8,7 @@ class ProductProduct(models.Model):
         code = self.product_tmpl_id.base_default_code or ''
         prefix, suffix = '', ''
 
-        for attr_val in self.attribute_value_ids.sorted(key=lambda r: r.position):
+        for attr_val in self.mapped('product_template_attribute_value_ids.product_attribute_value_id').sorted(key=lambda r: r.position):
             separator = attr_val.separator or ''
             separator.replace(' ', '')
             if separator.lower() == 'space':
@@ -37,7 +37,7 @@ class ProductProduct(models.Model):
                 pricelist.price = pricelist.price_with_extra
 
             # only create code if has attr_values
-            if prod.attribute_value_ids:
+            if prod.product_template_attribute_value_ids:
                 prod.default_code = prod.generate_extra_code()
         return res
 
