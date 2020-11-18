@@ -15,6 +15,7 @@ _logger = logging.getLogger(__name__)
 class AlsoBoughtProductsConf(models.TransientModel):
 	_name = 'also.bought.products.conf'
 	_inherit = 'webkul.website.addons'
+	_description = 'Also Bought Together Prodcuts'
 
 	use_automatic = fields.Boolean(
 		string="Add Products Automatically",

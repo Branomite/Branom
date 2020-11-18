@@ -11,7 +11,7 @@
                     <group>
                         <field name="website_id"/>
                         <field name="use_automatic"/>
-                        <field name="abtp_header"/>
+                        <field name="abtp_header" required ="1"/>
                     </group>
                     <footer>
                         <button string="Apply" type="object" name="execute" class="oe_highlight"/>
