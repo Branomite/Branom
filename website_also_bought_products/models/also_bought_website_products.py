@@ -21,6 +21,6 @@ class Website(models.Model):
 	)
 
 	abtp_header = fields.Char(
-		string="Header Message"
+		string="Header Message",
 		default="CUSTOMERS WHO BOUGHT THIS ITEM ALSO BOUGHT"
 	)
