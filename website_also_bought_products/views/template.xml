@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!-- Copyright (c) 2018-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+  <data>
+
+<template id="assets_frontend" inherit_id="website.assets_frontend" name="Also Bought">
+        <xpath expr="." position="inside">
+
+        <script type="text/javascript" src="/website_also_bought_products/static/src/js/owl-carousel/owl.carousel.min.js"></script>
+        <link rel="stylesheet" href="/website_also_bought_products/static/src/js/owl-carousel/owl.carousel.css"/>
+        <link rel="stylesheet" href="/website_also_bought_products/static/src/js/owl-carousel/owl.theme.css"/>
+        <script type="text/javascript" src="/website_also_bought_products/static/src/js/slider_js.js"></script>
+        <script type="text/javascript" src="/website_also_bought_products/static/src/js/also_bought_products.js"></script>
+
+        <link rel='stylesheet' href='/website_also_bought_products/static/src/scss/also_bought.scss'/>
+
+    </xpath>
+  </template>
+
+    <template id="product_inherited" inherit_id="website_sale.product" name="Show Also Bought Products" customize_show="True" active="True">
+        <xpath expr="//section[@id='product_detail']" position="after">
+            <div t-if="product.wk_also_bought_products" class="container">
+
+                <div class="card" style="margin-left: 9px; margin-right: 9px;">
+                    <div class="card-header" style="text-align: center;">
+                        <t t-esc="request.website.get_current_website().abtp_header"/>
+                    </div>
+                </div><br></br>
+                <div id="also-bought-products" class="owl-carousel">
+                    <div t-foreach="product.wk_also_bought_products" t-as="obj" class="item ab-item">
+                        <a t-attf-href="/shop/product/#{ slug(obj.product_tmpl_id) }">
+                            <img t-att-src="website.image_url(obj, 'image_128')" t-att-alt="obj.name"/>
+                        </a>
+                        <div>
+                            <strong>
+                                <a t-attf-href="/shop/product/#{ slug(obj.product_tmpl_id)}">
+                                    <t t-esc="obj.name"/>
+                                </a>
+                            </strong>
+                        </div>
+                        <div class="css_quantity input-group oe_website_spinner  mt8 mb4">
+                            <a t-attf-href="#" class="group group-left mb8 input-group-addon js_add_cart_json sub-qty">
+                                <i class="fa fa-minus"></i>
+                            </a>
+                            <input type="text" class="form-control quantity" data-min="1" name="add_qty" value="1"/>
+                            <a t-attf-href="#" class="group group-right mb8 input-group-addon float_left js_add_cart_json add-qty">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </div>
+                        <div class="btn btn-primary add-to-cart" t-att-product-id="obj.id">
+                            <strong>ADD TO CART</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+  </data>
+ </odoo>
