@@ -1,8 +1,4 @@
 from odoo import api, fields, models, _
-<<<<<<< HEAD
-=======
-# from odoo.addons import decimal_precision as dp
->>>>>>> [MIG][2280545] branom_sale: migration v12 to v13.
 
 
 class ProductAttributeValue(models.Model):

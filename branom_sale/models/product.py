@@ -1,10 +1,6 @@
 from odoo import models, fields, api, tools, _
-<<<<<<< HEAD
-=======
 from odoo.exceptions import UserError, ValidationError
 # from odoo.addons import decimal_precision as dp
-from odoo.tools.float_utils import float_compare, float_round
->>>>>>> [MIG][2280545] branom_sale: migration v12 to v13.
 
 
 class ProductProduct(models.Model):
