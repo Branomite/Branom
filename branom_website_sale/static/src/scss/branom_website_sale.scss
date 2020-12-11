@@ -1,0 +1,14 @@
+// Style for sub category card with image and description
+.brnm_subcat_card {
+    .brnm_subcat_name {
+        height: 100%;
+    }
+
+    &:hover {
+        box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+
+        .brnm_subcat_name {
+            background-color: gray('200') !important;
+        }
+    }
+}

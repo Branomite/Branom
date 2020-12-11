@@ -14,6 +14,7 @@ Customizations to website_sale
     ],
     'data': [
         'views/quick_order_templates.xml',
+        'views/templates.xml',
         'views/web_assets.xml',
     ],
     'installable': True,
