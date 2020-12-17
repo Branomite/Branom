@@ -13,16 +13,7 @@ _logger = logging.getLogger(__name__)
 class QuickOrder(http.Controller):
     @http.route('/quick-order', type='http', auth='public', website=True, sitemap=False)
     def quick_order(self, *args, **kwargs):
-        order = request.website.sale_get_order()
-        if order and order.state != 'draft':
-            request.session['sale_order_id'] = None
-            order = request.website.sale_get_order()
-        vals = {
-            'order': order,
-        }
-        if kwargs.get('type') == 'popover':
-            return request.render('branom_website_sale.quick_order_popover', vals, headers={'Cache-Control': 'no-cache'})
-        return request.render('branom_website_sale.quick_order_page', vals)
+        return request.render('branom_website_sale.quick_order_page')
 
     @http.route('/quick-order/validate', type='json', auth='public', website=True, sitemap=False)
     def validate_sku(self, *data, **kwargs):
@@ -31,13 +22,13 @@ class QuickOrder(http.Controller):
         _logger.warning(kwargs)
 
         sku = kwargs.get('sku')
+        response = {'success': False, 'message': ''}
         if sku:
             odoo_product = request.env['product.template'].search([('default_code', '=', sku)], limit=1)
             if odoo_product and odoo_product._is_add_to_cart_possible():
-                return True
-            else:
-                return False
-        return False
+                response['success'] = True
+                response['message'] = odoo_product.name
+        return response
 
     @http.route(['/quick-order/add-items'], type='json', auth='public', website=True, sitemap=False)
     def add_items(self, **data):

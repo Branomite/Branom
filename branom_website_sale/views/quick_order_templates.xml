@@ -8,38 +8,33 @@
                 <a href="/quick-order" class="nav-link">
                     Quick Order
                 </a>
+                <div id="brnm_quick_order_popover" style="display: none;">
+                    <t t-if="request.httprequest.path != '/quick-order'">
+                        <t t-call="branom_website_sale.quick_order_form">
+                            <t t-set="popover" t-value="true"/>
+                        </t>
+                    </t>
+                    <form t-else=""></form>
+                </div>
             </li>
         </xpath>
     </template>
 
     <template id="quick_order_form" name="Quick Order Form">
-        <form id="brnm_quickorder_form" t-attf-class="container-fluid{{'' if popover else ' mt32'}}" action="/quick-order" method="post">
-            <div id="brnm_qo_errors" class="alert alert-danger" style="display: none;" role="alert">
+        <form t-attf-class="brnm_quickorder_form container-fluid{{'' if popover else ' mt32'}}" action="/quick-order" method="post">
+            <div class="brnm_qo_errors alert alert-danger" style="display: none;" role="alert">
                 <ul class="m-0">
                 </ul>
             </div>
-            <div id="quick_order_lines">
+            <div class="quick_order_lines">
                 <t t-set="line_count" t-value="0"/>
-                <t t-foreach="order.order_line" t-as="line">
-                    <div class="quick_order_row form-group row form-field o_website_form_custom" t-attf-data-line-num="{{line_count}}">
-                        <div t-attf-class="{{ 'col-8 px-0' if popover else 'col-lg-7 col-md-7'}}">
-                            <input type="text" class="brnm_sku_input form-control o_website_form_input"
-                                   t-attf-name="item_num_{{line_count}}" t-attf-value="{{line.product_id.default_code}}"/>
-                        </div>
-                        <div t-attf-class="{{'col-4' if popover else 'col-lg-3 col-md-4'}}">
-                            <input type="text" class="brnm_qty_input form-control o_website_form_input"
-                                   t-attf-name="qty_{{line_count}}" t-attf-value="{{int(line.product_uom_qty) if line.product_uom_qty == int(line.product_uom_qty) else line.product_uom_qty}}"/>
-                        </div>
-                    </div>
-                    <t t-set="line_count" t-value="line_count + 1"/>
-                </t>
-
                 <t t-foreach="range(3)" t-as="extra_line">
                     <div class="quick_order_row form-group row form-field o_website_form_custom"
                          t-attf-data-line-num="{{line_count}}">
                         <div t-attf-class="{{ 'col-8 px-0' if popover else 'col-lg-7 col-md-7'}}">
                             <input type="text" class="brnm_sku_input form-control o_website_form_input"
                                    t-attf-name="item_num_{{line_count}}" placeholder="Item #"/>
+                            <div class="brnm_qo_feedback"/>
                         </div>
                         <div t-attf-class="{{'col-4' if popover else 'col-lg-3 col-md-4'}}">
                             <input type="text" class="brnm_qty_input form-control o_website_form_input"
@@ -52,18 +47,13 @@
 
             <div class="form-group row">
                 <div t-attf-class="{{'col px-0' if popover else 'col-md-10 col-lg-9'}}">
-                    <button type="button" id="brnm_qo_add_item"
-                            t-attf-class="btn btn-info{{'' if popover else ' btn-lg'}}">
+                    <button type="button"
+                            t-attf-class="brnm_qo_add_item btn btn-info{{'' if popover else ' btn-lg'}}">
                         Add line
                     </button>
-                    <button t-if="line_count == 0" type="submit" id="brnm_qo_add_to_cart"
-                            t-attf-class="btn btn-primary{{'' if popover else ' btn-lg'}}"
+                    <button type="submit"
+                            t-attf-class="brnm_qo_add_to_cart btn btn-primary{{'' if popover else ' btn-lg'}}"
                             disabled="disabled">
-                        <i class="fa fa-shopping-cart"/>
-                        Add to Cart
-                    </button>
-                    <button t-else="" type="submit" id="brnm_qo_add_to_cart"
-                            t-attf-class="btn btn-primary{{'' if popover else ' btn-lg'}}">
                         <i class="fa fa-shopping-cart"/>
                         Add to Cart
                     </button>
@@ -71,12 +61,6 @@
                 </div>
             </div>
         </form>
-    </template>
-
-    <template id="quick_order_popover" name="Quick Order Popover">
-        <t t-call="branom_website_sale.quick_order_form">
-            <t t-set="popover" t-value="true"/>
-        </t>
     </template>
 
     <template id="quick_order_page" name="Quick Order">
