@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
+    <template id="product_inherit" inherit_id="website_sale.product">
+        <hr t-if="product.description_sale" position="attributes">
+            <attribute name="t-if">product.description_sale or product.default_code</attribute>
+        </hr>
+        <xpath expr="//p[@t-field='product.description_sale']" position="before">
+            <p itemprop="default_code" t-att-content="product.default_code" t-field="product.default_code"
+                 t-att-class="brnm_sale_default_code_desc"/>
+        </xpath>
+    </template>
+
+    <template id="products_item_inherit" inherit_id="website_sale.products_item">
+        <xpath expr="//*[hasclass('o_wsale_products_item_title')]/a[@itemprop='name']" position="after">
+            <p itemprop="default_code" t-att-content="product.default_code" t-field="product.default_code" t-att-class="brnm_sale_default_code"/>
+        </xpath>
+    </template>
+
     <template id="products_inherit_show_categories" inherit_id="website_sale.products" name="Show Product Categories">
         <xpath expr="//div[@id='category_header']" position="after">
             <t t-call="branom_website_sale.sub_category_links"/>
