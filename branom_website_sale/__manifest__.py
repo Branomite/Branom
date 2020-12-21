@@ -11,10 +11,12 @@ Customizations to website_sale
         'crm',
         'sale',
         'website_sale',
+        'website_sale_wishlist',
     ],
     'data': [
         'views/quick_order_templates.xml',
         'views/templates.xml',
+        'views/save_products_templates.xml',
         'views/web_assets.xml',
     ],
     'installable': True,

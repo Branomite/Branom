@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="save_products_header" inherit_id="website_sale_wishlist.header" name="Header Shop Save For Later Link">
+        <xpath expr="//a[@href='/shop/wishlist']" position="replace">
+            <a href="/shop/wishlist" class="nav-link">
+                <i class="fa fa-bookmark"/>
+                Save For Later <sup t-attf-class="my_wish_quantity o_animate_blink badge badge-primary"><t t-esc='wishcount'/></sup>
+            </a>
+        </xpath>
+    </template>
+
+    <template id="save_products" inherit_id="website_sale_wishlist.product_wishlist" name="Save For Later Page">
+        <xpath expr="//section[hasclass('wishlist-section')]/h3" position="replace">
+            <h3>My Saved Products</h3>
+        </xpath>
+        <xpath expr="//section[hasclass('wishlist-section')]//label" position="replace">
+            <label class='text-muted'><input type="checkbox" id='b2b_wish' value="1" class="mr8"/>Add product to my cart but keep it saved</label>
+        </xpath>
+    </template>
+
+    <template id="add_to_save_products" inherit_id="website_sale_wishlist.add_to_wishlist" name="Save product">
+        <xpath expr="//button[hasclass('o_add_wishlist')]" position="replace">
+            <button t-if="product_variant_id" type="button" role="button" class="btn btn-secondary o_add_wishlist" t-att-disabled='in_wish or None' title="Save For Later" t-att-data-product-template-id="product.id" t-att-data-product-product-id="product_variant_id" data-action="o_wishlist"><span class="fa fa-bookmark" role="img" aria-label="Save For Later"></span> Save For Later</button>
+        </xpath>
+    </template>
+
+    <template id="product_add_to_save_products" inherit_id="website_sale_wishlist.product_add_to_wishlist" name='Save product in product page'>
+        <xpath expr="//button[hasclass('o_add_wishlist_dyn')]" position="replace">
+            <button t-if="product_variant" type="button" role="button" class="btn btn-link mt16 o_add_wishlist_dyn" t-att-disabled='in_wish or None' t-att-data-product-template-id="product.id" t-att-data-product-product-id="product_variant.id" data-action="o_wishlist"><span class="fa fa-bookmark" role="img" aria-label="Save For Later"></span> Save For Later</button>
+        </xpath>
+    </template>
+
+</odoo>
