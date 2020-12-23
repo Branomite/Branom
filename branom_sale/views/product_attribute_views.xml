@@ -15,7 +15,7 @@
                 <field name="position"/>
                 <field name="separator"/>
                 <field name="affix_type"/>
-            </field>
+            </tree>
         </field>
     </record>
 
