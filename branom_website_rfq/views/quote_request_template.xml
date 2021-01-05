@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Request for Quote Page -->
+    <template id="rfq_form_page" name="Request for Quote">
+        <t t-call="website.layout">
+            <div class="wrap">
+                <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
+                <div class="container">
+                    <div class="row">
+                        <t t-call="branom_website_sale.rfq_order_form"/>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Request for Quote Form -->
+    <template id="rfq_order_form" name="Quote Request Form">
+        <h3 class="mt32">Quote Request</h3>
+        <t t-call="branom_website_sale.rfq_table"/>
+        <div class="form-group row">
+            <div class="col-md-10 col-lg-9">
+                <a href="/shop/rfq/form/submit" class="brnm_submit_rfq btn btn-primary btn-lg">
+                    Submit
+                </a>
+                <span id="o_website_form_result"></span>
+            </div>
+        </div>
+    </template>
+
+    <!-- Quote request confirmation page -->
+    <template id="rfq_confirmation_page" name="Quote Request Confirmation">
+        <t t-call="website.layout">
+            <h3 class="mt32">Confirmed</h3>
+            <div class="mt16 mb32">
+                <div class="form-group row">
+                    <div class="col-md-10 col-lg-9">
+                        <div id="rfq_confirmation_status">
+                            <p>Confirmation Message</p>
+                        </div>
+                        <a href="/shop">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+    </template>
+
+
+</odoo>
