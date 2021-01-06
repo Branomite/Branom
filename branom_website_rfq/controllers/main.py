@@ -44,34 +44,24 @@ class WebsiteSaleRFQ(Controller):
             operation = data.get('params').get('operation', False)
             request_qty = data.get('params').get('request_qty', False)
 
-            _logger.warn(request_qty)
             # Process Qty
             if request_qty:
                 qty = int(request_qty)
             else:
                 qty = False
-            _logger.warn('QTY: %s' % qty)
 
             # Process Product
-            _logger.warn('JS product_id: %s' % product_id)
             if product_id:
                 product = request.env['product.template'].search([('id', '=', product_id)])
-                if product:
-                    _logger.warn('product found: %s' % product.name)
             else:
                 product = False
-
-            _logger.warn('operation: %s' % operation)
 
             # Enforce a valid product and operation
             if product and operation:
 
                 product_line = order.rfq_line_ids.filtered(lambda l: l.product_id.id == product.id)
-                if product_line:
-                    _logger.warn('Product Line: %s' % product_line.product_id.name)
 
                 if operation == 'create':
-                    _logger.warn('CREATE')
                     # update existing line if the same product is added multiple times or create a new line
                     if product_line:
                         new_qty = product_line.request_qty + 1
@@ -117,12 +107,9 @@ class WebsiteSaleRFQ(Controller):
         if order and partner:
             new_lead = order.convert_rfq_to_lead()
             if new_lead:
-                _logger.warn(new_lead)
-                _logger.warn('New Lead Created')
                 return request.render('branom_website_sale.rfq_confirmation_page',
                                       {'status': 'Success', 'message': 'Your quote request has been received.'})
             else:
-                _logger.warn('Failed to complete lead')
                 return request.render('branom_website_sale.rfq_confirmation_page',
                                       {'status': 'Failed', 'message': 'Your quote request could not be sent.'})
 
