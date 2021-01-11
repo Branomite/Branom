@@ -14,8 +14,9 @@ class Pricelist(models.Model):
         Take the _compute_price_rule function from product.pricelist
         Modify it to fit with Branom's Commission flow. 
         Use New Unit price gathered from SO instead of getting the unit price from 
-        the template.        
+        the template.
     """
+
     def _inv_compute_price_rule(self, products_qty_partner, price_unit, date=False, uom_id=False):
         """ Low-level method - Mono pricelist, multi products
         Returns: dict{product_id: (price, suitable_rule) for the given pricelist}

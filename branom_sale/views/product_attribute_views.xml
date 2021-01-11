@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!--View to add Prefix/Suffix Configuration-->
+    <record id="variants_tree_view_branom" model="ir.ui.view">
+        <field name="name">product.attribute.value.tree.branom</field>
+        <field name="model">product.attribute.value</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Variant Values" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="attribute_id"/>
+                <field name="name"/>
+                <field name="cost_extra"/>
+                <field name="manufacture_code"/>
+                <field name="position"/>
+                <field name="separator"/>
+                <field name="affix_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="variants_action" model="ir.actions.act_window">
+        <field name="name">Attribute Values</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.attribute.value</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem id="menu_catalog_variants_action"
+        action="branom_sale.variants_action"
+        parent="sale.prod_config_main" groups="product.group_product_variant" sequence="2"/>
 
     <!-- Boolean for Hide in prod config -->
     <record id="product_attribute_view_form_branom_inherit" model="ir.ui.view">

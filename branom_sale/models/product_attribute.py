@@ -36,4 +36,3 @@ class ProductTemplateAttributeValue(models.Model):
         help="""Make this attribute value not compatible with
             other values of the product or some attribute values of optional and accessory products.""",
         copy=True)
-

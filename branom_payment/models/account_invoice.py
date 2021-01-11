@@ -21,14 +21,18 @@ class AccountMove(models.Model):
                  'currency_id', 'company_id', 'invoice_date', 'type')
     def _compute_amount_with_discount(self):
         for move in self:
+            round_curr = move.currency_id.round
             # discounted here means to be discounted, sorry future devs
-            discounted, undiscounted = sum(line.price_total for line in move.invoice_line_ids.filtered(lambda l: not l.exclude_discount)), sum(line.price_total for line in move.invoice_line_ids.filtered(lambda l: l.exclude_discount))
+            discounted, undiscounted = sum(line.price_total for line in move.invoice_line_ids.filtered(lambda l: not l.exclude_discount)), sum(
+                line.price_total for line in move.invoice_line_ids.filtered(lambda l: l.exclude_discount))
 
             amount_discounted_company, amount_undiscounted_company = discounted, undiscounted
             if move.currency_id and move.company_id and move.currency_id != move.company_id.currency_id:
                 currency_id = move.currency_id
-                amount_discounted_company = currency_id._convert(discounted, move.company_id.currency_id, move.company_id, move.invoice_date or fields.Date.today())
-                amount_undiscounted_company = currency_id._convert(undiscounted, move.company_id.currency_id, move.company_id, move.invoice_date or fields.Date.today())
+                amount_discounted_company = currency_id._convert(
+                    discounted, move.company_id.currency_id, move.company_id, move.invoice_date or fields.Date.today())
+                amount_undiscounted_company = currency_id._convert(
+                    undiscounted, move.company_id.currency_id, move.company_id, move.invoice_date or fields.Date.today())
 
             sign = move.type in ['in_refund', 'out_refund'] and -1 or 1
             move.amount_discounted_company_signed = amount_discounted_company * sign
@@ -42,12 +46,13 @@ class AccountMoveLine(models.Model):
 
     exclude_discount = fields.Boolean('Exclude Discount')
 
-    @api.model
-    def create(self, vals):
-        rids = super(AccountMoveLine, self).create(vals)
-        for rid in rids:
-            rid.exclude_discount = rid.product_id.exclude_discount  # cannot call onchange product id since it will pull the original price for products
-        return rids
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super(AccountMoveLine, self).create(vals_list)
+        for rec in res:
+            # cannot call onchange product id since it will pull the original price for products
+            rec.exclude_discount = rec.product_id.exclude_discount
+        return res
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
