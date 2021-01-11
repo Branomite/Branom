@@ -9,15 +9,16 @@
             <field name="arch" type="xml">
                <form string="Also Bought Products" class="oe_form_configuration">
                     <group>
+                        <field name="website_id"/>
                         <field name="use_automatic"/>
-                        <field name="header"/>
+                        <field name="abtp_header" required ="1"/>
                     </group>
                     <footer>
                         <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                         or
                         <button special="cancel" string="Cancel" class="btn-default"/>
                     </footer>
-                </form> 
+                </form>
             </field>
         </record>
         <record id="action_also_bought_products" model="ir.actions.act_window">

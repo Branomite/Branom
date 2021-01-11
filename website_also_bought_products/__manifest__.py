@@ -17,7 +17,7 @@
   "name"                 :  "Website Also Bought Products",
   "summary"              :  """Odoo Website Also Bought Products Module lets you implement ‘people who bought this item also bought’ strategy on your website.""",
   "category"             :  "Website",
-  "version"              :  "1.0.0",
+  "version"              :  "1.0.2",
   "sequence"             :  1,
   "author"               :  "Webkul Software Pvt. Ltd.",
   "license"              :  "Other proprietary",

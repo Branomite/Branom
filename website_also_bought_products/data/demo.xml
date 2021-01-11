@@ -7,7 +7,7 @@
     <function model="ir.default" name="set"
     eval="('also.bought.products.conf', 'use_automatic', True)"/>
     <function model="ir.default" name="set"
-    eval="('also.bought.products.conf', 'header', 'CUSTOMERS WHO BOUGHT THIS ITEM ALSO BOUGHT')"/>
+    eval="('also.bought.products.conf', 'abtp_header', 'CUSTOMERS WHO BOUGHT THIS ITEM ALSO BOUGHT')"/>
 
 
     </data>
