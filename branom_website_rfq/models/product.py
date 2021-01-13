@@ -31,8 +31,9 @@ class ProductTemplate(models.Model):
 
             if int(self.restrict_sale_loc_tmpl.zip_from) <= int(partner.zip) <= int(self.restrict_sale_loc_tmpl.zip_to):
                 return True
+
         else:
-            return False
+            return True
 
 
 class ProductProduct(models.Model):
