@@ -12,6 +12,7 @@ Customizations to website_sale to add quote request functionality
         'sale',
         'website',
         'website_sale',
+        'website_sale_wishlist',
     ],
     'data': [
         'security/ir.model.access.csv',
