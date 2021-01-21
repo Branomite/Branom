@@ -296,7 +296,7 @@
     <template id="extra_step_rfq_table" inherit_id="website_sale.extra_info">
         <xpath expr="//form" position="before">
             <t t-if="website_sale_order.rfq_line_ids">
-                <t t-call="branom_website_sale.rfq_table"/>
+                <t t-call="branom_website_rfq.rfq_table"/>
             </t>
         </xpath>
         <xpath expr="//label[@for='Give us your feedback']" position="replace">

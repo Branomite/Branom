@@ -8,7 +8,7 @@
                 <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
                 <div class="container">
                     <div class="row">
-                        <t t-call="branom_website_sale.rfq_order_form"/>
+                        <t t-call="branom_website_rfq.rfq_order_form"/>
                     </div>
                 </div>
             </div>
@@ -18,7 +18,7 @@
     <!-- Request for Quote Form -->
     <template id="rfq_order_form" name="Quote Request Form">
         <h3 class="mt32">Quote Request</h3>
-        <t t-call="branom_website_sale.rfq_table"/>
+        <t t-call="branom_website_rfq.rfq_table"/>
         <div class="form-group row">
             <div class="col-md-10 col-lg-9">
                 <a href="/shop/rfq/form/submit" class="brnm_submit_rfq btn btn-primary btn-lg">
