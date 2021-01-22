@@ -218,9 +218,11 @@
                         </td>
                         <td t-if="line.product_id" class='td-product_name'>
                             <div>
-                                <t t-call="website_sale.cart_line_product_link">
-                                    <strong t-field="line.product_id.name"/>
-                                </t>
+                                <!-- TODO: AttributeError: 'sale.order.rfq.line' object has no attribute 'event_id' from studio field  -->
+<!--                                <t t-call="website_sale.cart_line_product_link">-->
+<!--                                    <strong t-field="line.product_id.name"/>-->
+<!--                                </t>-->
+                                <strong t-field="line.product_id.name"/>
                             </div>
                         </td>
                         <td class="text-center td-qty">
