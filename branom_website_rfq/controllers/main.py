@@ -94,7 +94,7 @@ class WebsiteSaleRFQ(Controller):
     # Show users outcome of RFQ submit and clear lines from order if successful
     @route('/shop/rfq/form/confirmation', type='http', auth='public', website=True, sitemap=False)
     def rfq_form_confirmation(self):
-        return request.render('branom_website_sale.rfq_confirmation_page')
+        return request.render('branom_website_rfq.rfq_confirmation_page')
 
     # Submit Data for Form and create CRM leads; Then direct to confirmation page
     @route('/shop/rfq/form/submit', type='http', auth='public', website=True, sitemap=False)
@@ -107,13 +107,13 @@ class WebsiteSaleRFQ(Controller):
         if order and partner:
             new_lead = order.convert_rfq_to_lead()
             if new_lead:
-                return request.render('branom_website_sale.rfq_confirmation_page',
+                return request.render('branom_website_rfq.rfq_confirmation_page',
                                       {'status': 'Success', 'message': 'Your quote request has been received.'})
             else:
-                return request.render('branom_website_sale.rfq_confirmation_page',
+                return request.render('branom_website_rfq.rfq_confirmation_page',
                                       {'status': 'Failed', 'message': 'Your quote request could not be sent.'})
 
     # Main RFQ page - used to allow users to submit RFQ without cart items
     @route('/shop/rfq/form', type='http', auth='public', website=True, sitemap=False)
     def rfq_form_page(self):
-        return request.render('branom_website_sale.rfq_form_page')
+        return request.render('branom_website_rfq.rfq_form_page')
