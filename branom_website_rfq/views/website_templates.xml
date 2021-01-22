@@ -195,16 +195,6 @@
         </xpath>
     </template>
 
-    <!-- First Step in cart -->
-    <!--    <template id="website_sale_cart_lines_inherit" inherit_id="website_sale.cart_lines">-->
-    <!--        <xpath expr="//table" position="after">-->
-    <!--            <t t-if="website_sale_order.rfq_line_ids">-->
-    <!--                <h3>Quote Request</h3>-->
-    <!--                <t t-call="branom_website_sale.rfq_table"/>-->
-    <!--            </t>-->
-    <!--        </xpath>-->
-    <!--    </template>-->
-
     <!-- Request Quote Table -->
     <template id="rfq_table">
         <table t-if="website_sale_order.rfq_line_ids"
