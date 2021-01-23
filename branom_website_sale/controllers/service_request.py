@@ -4,14 +4,13 @@ from odoo.http import request
 
 class ServiceRequestController(http.Controller):
     @http.route('/service', type='http', auth='public', website=True, sitemap=False)
-    def service_request(self, *args, **kwargs):
-        render_values = {
-            'countries': request.env['res.country'].get_website_sale_countries()
-        }
-        return request.render('branom_website_sale.service_request', render_values)
+    def service_request(self, *args, **post):
+        if request.httprequest.method != 'POST':
+            render_values = {
+                'countries': request.env['res.country'].get_website_sale_countries()
+            }
+            return request.render('branom_website_sale.service_request', render_values)
 
-    @http.route('/service-process', type='http', auth='public', website=True, sitemap=False, methods=['POST'])
-    def process_request(self, *args, **post):
         create_vals = {}
         for key, val in post.items():
             if key in ('name', 'partner_name', 'street', 'street2', 'phone', 'email_from',):

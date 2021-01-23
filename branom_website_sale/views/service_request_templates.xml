@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
+    <template id="assets_frontend" inherit_id="website.assets_frontend">
+        <xpath expr="script[last()]" position="after">
+            <script type="text/javascript" src="/branom_website_sale/static/src/js/service_request.js"></script>
+        </xpath>
+    </template>
+
     <template id="service_request_fields_contact" name="Service Request Contact Fields">
         <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
             <div class="col-lg-3 col-md-4">
@@ -139,7 +145,7 @@
     </template>
 
     <template id="service_request_form" name="Service Request Form">
-        <form id="service_request_form" action="/service-process" method="post" class="container-fluid mt32">
+        <form id="brnm_service_request_form" action="/service-process" method="post" class="container-fluid mt32">
             <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
             <t t-call="branom_website_sale.service_request_fields_contact"/>
             <t t-call="branom_website_sale.service_request_fields_info"/>
