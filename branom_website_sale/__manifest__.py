@@ -20,6 +20,7 @@ Customizations to website_sale
         'views/quick_order_templates.xml',
         'views/templates.xml',
         'views/save_products_templates.xml',
+        'views/service_request_templates.xml',
         'views/web_assets.xml',
         'views/website_views.xml',
     ],

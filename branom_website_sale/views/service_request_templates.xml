@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="service_request_fields_contact" name="Service Request Contact Fields">
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-lg-3 col-md-4">
+                <label class="col-form-label" for="partner_name">Company Name</label>
+            </div>
+            <div class="col-lg-7 col-md-8">
+                <input t-if="user_id._is_public()" type="text" class="form-control o_website_form_input" name="partner_name" required=""/>
+                <input t-else="" type="text" class="form-control o_website_form_input" name="partner_name" required="" t-att-value="user_id.company_id.name"/>
+            </div>
+        </div>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-lg-3 col-md-4">
+                <label class="col-form-label" for="street">Address</label>
+            </div>
+            <div class="col-lg-7 col-md-8">
+                <input t-if="user_id._is_public()" type="text" class="form-control o_website_form_input" name="street" required=""/>
+                <input t-else="" type="text" class="form-control o_website_form_input" name="street" required="" t-att-value="user_id.street"/>
+            </div>
+        </div>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="offset-lg-3 offset-md-4 col-lg-7 col-md-8">
+                <input t-if="user_id._is_public() or not user_id.street2" type="text" class="form-control o_website_form_input" name="street2" required=""/>
+                <input t-else="" type="text" class="form-control o_website_form_input" name="street2" t-att-value="user_id.street2"/>
+            </div>
+        </div>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="offset-lg-3 offset-md-4 col-lg-7 col-md-8">
+                <label class="col-form-label" for="country_id">Country</label>
+                <select id="country_id" name="country_id" class="form-control">
+                    <option value="">Country...</option>
+                    <t t-foreach="countries" t-as="c">
+                        <option t-att-value="c.id" t-att-selected="c == user_id.country_id">
+                            <t t-esc="c.name"/>
+                        </option>
+                    </t>
+                </select>
+                <select name="state_id" class="form-control"
+                        data-init="1">
+                    <option value="">State / Province...</option>
+                    <t t-foreach="user_id.country_id and user_id.country_id.state_ids or []" t-as="s">
+                        <option t-att-value="s.id"
+                                t-att-selected="s == user_id.state_id">
+                            <t t-esc="s.name"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+        </div>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-lg-3 col-md-4">
+                <label class="col-form-label" for="name">Contact Name</label>
+            </div>
+            <div class="col-lg-7 col-md-8">
+                <input t-if="user_id._is_public()" type="text" class="form-control o_website_form_input" name="name" required=""/>
+                <input t-else="" type="text" class="form-control o_website_form_input" name="name" required="" t-att-value="user_id.name"/>
+            </div>
+        </div>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-lg-3 col-md-4">
+                <label class="col-form-label" for="phone">Phone Number</label>
+            </div>
+            <div class="col-lg-7 col-md-8">
+                <input t-if="user_id._is_public()" type="text" class="form-control o_website_form_input" name="phone" required=""/>
+                <input t-else="" type="text" class="form-control o_website_form_input" name="phone" required="" t-att-value="user_id.phone"/>
+            </div>
+        </div>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-lg-3 col-md-4">
+                <label class="col-form-label" for="email_from">Email</label>
+            </div>
+            <div class="col-lg-7 col-md-8">
+                <input t-if="user_id._is_public()" type="text" class="form-control o_website_form_input" name="email_from" required=""/>
+                <input t-else="" type="text" class="form-control o_website_form_input" name="email_from" required="" t-att-value="user_id.email"/>
+            </div>
+        </div>
+    </template>
+
+    <template id="service_request_fields_info" name="Service Request Info Fields">
+        <h4>Requested Services</h4>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-lg-3 col-md-4">
+                <label class="col-form-label">Calibration Level</label>
+            </div>
+            <div class="col-md-2">
+                <input type="radio" id="calibration_sticker" name="calibration" value="Sticker"/>
+                <label for="calibration_sticker">Sticker</label>
+            </div>
+            <div class="col-md-6">
+                <input type="radio" id="calibration_nist" name="calibration" value="Sticker &amp; NIST Certificate"/>
+                <label for="calibration_nist">Sticker &amp; NIST Certificate</label>
+            </div>
+        </div>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-lg-3 col-md-4">
+                <label class="col-form-label">Repair, if needed</label>
+            </div>
+            <div class="col-md-2">
+                <input type="radio" id="repair_approved" name="repair" value="Approved"/>
+                <label for="repair_approved">Approved</label>
+            </div>
+            <div class="col-md-6">
+                <input type="radio" id="repair_quote" name="repair" value="Quote needed"/>
+                <label for="repair_quote">Quote needed</label>
+            </div>
+        </div>
+        <h4>Payment</h4>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-md-4">
+                <input type="radio" id="payment_po" name="payment" value="Purchase Order"/>
+                <label for="payment_po">Purchase Order</label>
+            </div>
+            <div class="col-md-4">
+                <input type="radio" id="payment_cc" name="payment" value="Credit Card"/>
+                <label for="payment_cc">Credit Card</label>
+            </div>
+            <div class="col-md-4">
+                <input type="radio" id="payment_cash" name="payment" value="Cash/Check"/>
+                <label for="payment_cash">Cash/Check</label>
+            </div>
+        </div>
+        <h4>Method of Return</h4>
+        <div class="form-group row form-field o_website_form_custom o_website_form_required_custom">
+            <div class="col-md-4">
+                <input type="radio" id="return_pu" name="return" value="Pick Up"/>
+                <label for="return_pu">Pick Up</label>
+            </div>
+            <div class="col-md-4">
+                <input type="radio" id="return_ups" name="return" value="UPS"/>
+                <label for="return_ups">UPS</label>
+            </div>
+            <div class="col-md-4">
+                <input type="radio" id="return_other" name="return" value="Other"/>
+                <label for="return_other">Other</label>
+            </div>
+        </div>
+    </template>
+
+    <template id="service_request_form" name="Service Request Form">
+        <form id="service_request_form" action="/service-process" method="post" class="container-fluid mt32">
+            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+            <t t-call="branom_website_sale.service_request_fields_contact"/>
+            <t t-call="branom_website_sale.service_request_fields_info"/>
+            <div class="form-group row">
+                <div class="offset-lg-3 offset-md-4 col-md-8 col-lg-7">
+                    <button type="submit" class="btn btn-primary btn-lg">Send</button>
+                    <span id="o_website_form_result"/>
+                </div>
+            </div>
+        </form>
+    </template>
+
+    <template id="service_request" name="Service Request">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure">
+                    <section class="pt8 pb8">
+                        <div class="container">
+                            <div class="row s_nb_column_fixed">
+                                <div class="col-lg-12 s_title pt16 pb16">
+                                    <h1>Service Request</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="container mt-2">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="oe_structure">
+                                <section class="s_text_block">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <p>
+                                                    Help text.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <t t-call="branom_website_sale.service_request_form"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="service_confirmation" name="Service Request Received">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="oe_structure" id="oe_structure_website_form_service_confirmation"/>
+                <div class="container pt-3">
+                    <h1>Thanks!</h1>
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="alert alert-success" role="status">
+                                Your request for service has been received.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
