@@ -64,6 +64,7 @@ publicWidget.registry.websiteSaleCategory = publicWidget.Widget.extend({
                     // selectStates.parent('div').show();
                 } else {
                     // selectStates.val('').parent('div').hide();
+                    selectStates.val('');
                 }
                 selectStates.data('init', 0);
             } else {
