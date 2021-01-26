@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
-    <record model="ir.cron" id="ir_cron_product_data_mig">
+    <record model="ir.cron" id="ir_cron_product_data_mig_1">
         <field name="name">BRANOM MIG: Match product attributes with studio field values.</field>
         <field name="model_id" ref="branom_mig.model_mig_base"/>
         <field name="user_id" ref="base.user_root"/>
@@ -14,7 +14,7 @@
         <field eval="False" name="doall"/>
     </record>
 
-    <record model="ir.cron" id="ir_cron_product_data_mig">
+    <record model="ir.cron" id="ir_cron_product_data_mig_2">
         <field name="name">BRANOM MIG: Create product attributes from studio fields.</field>
         <field name="model_id" ref="branom_mig.model_mig_base"/>
         <field name="user_id" ref="base.user_root"/>
