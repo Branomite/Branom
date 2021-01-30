@@ -1,7 +1,7 @@
 odoo.define('branom_website_sale.service_request', function (require) {
 'use strict';
 
-console.log('Service Request 13.0.0');
+// console.log('Service Request 13.0.3');
 
 var core = require('web.core');
 var publicWidget = require('web.public.widget');
@@ -10,6 +10,9 @@ publicWidget.registry.websiteSaleCategory = publicWidget.Widget.extend({
     selector: '#brnm_service_request_form',
     events: {
         'change select[name="country_id"]': '_changeCountry',
+        'change input[name="payment"]': '_changePayment',
+        'change input[name="return"]': '_changeReturn',
+        'change input[name="return_info"]': '_changeReturnInfo',
     },
     /**
      * @constructor
@@ -84,6 +87,39 @@ publicWidget.registry.websiteSaleCategory = publicWidget.Widget.extend({
             //     });
             // }
         });
+    },
+    _changePayment: function (ev) {
+        var val = $('input[name="payment"]:checked').val();
+        var $po_input = $('input[name="po"]');
+        if (val === "Purchase Order") {
+            $po_input.prop('required', true);
+            $po_input.prop('disabled', false);
+        } else {
+            $po_input.prop('required', false);
+            $po_input.prop('disabled', true);
+        }
+    },
+    _changeReturn: function (ev) {
+        var val = $('input[name="return"]:checked').val();
+        var $return_info = $('input[name="return_info"]');
+        if (val === "Pick Up") {
+            $return_info.prop('required', false);
+            $return_info.prop('disabled', true);
+        } else {
+            $return_info.prop('required', true);
+            $return_info.prop('disabled', false);
+        }
+    },
+    _changeReturnInfo: function (ev) {
+        var val = $('input[name="return_info"]:checked').val();
+        var $collect_num = $('input[name="collect_num"]');
+        if (val === "Collect") {
+            $collect_num.prop('required', true);
+            $collect_num.prop('disabled', false);
+        } else {
+            $collect_num.prop('required', false);
+            $collect_num.prop('disabled', true);
+        }
     },
 });
 });

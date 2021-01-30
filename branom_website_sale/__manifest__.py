@@ -14,6 +14,7 @@ Customizations to website_sale
         'website_sale_wishlist',
     ],
     'data': [
+        'data/service_request.xml',
         'views/account_portal_payment_templates.xml',
         'views/payment_templates.xml',
         'views/product_views.xml',

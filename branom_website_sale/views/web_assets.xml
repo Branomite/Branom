@@ -9,6 +9,7 @@
             <script type="text/javascript" src="/branom_website_sale/static/src/js/brnm_quick_order_popup.js"></script>
             <script type="text/javascript" src="/branom_website_sale/static/src/js/portal_payment.js"></script>
             <script type="text/javascript" src="/branom_website_sale/static/src/js/website_portal_patch.js"></script>
+            <script type="text/javascript" src="/branom_website_sale/static/src/js/service_request.js"></script>
         </xpath>
     </template>
 </odoo>
