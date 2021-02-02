@@ -31,7 +31,7 @@ class AccountMove(models.Model):
     #     return res
 
     def post(self):
-        move_lines = self.line_ids.filtered(lambda l: l.mapped('sale_line_ids.order_id').sales_type)
+        move_lines = self.line_ids.filtered(lambda l: l.mapped('sale_line_ids.order_id').sales_type == 'commission')
         if move_lines:
             self.line_ids.write({
                 'credit': False,
