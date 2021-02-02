@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record model="ir.cron" id="ir_cron_product_data_mig_1">
+        <field name="name">BRANOM MIG: Match product attributes with studio field values.</field>
+        <field name="model_id" ref="branom_mig.model_mig_base"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="state">code</field>
+        <field name="code">model.run_product_migration()</field>
+        <field eval="False" name="active"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field eval="False" name="doall"/>
+    </record>
+
+    <record model="ir.cron" id="ir_cron_product_data_mig_2">
+        <field name="name">BRANOM MIG: Create product attributes from studio fields.</field>
+        <field name="model_id" ref="branom_mig.model_mig_base"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="state">code</field>
+        <field name="code">model.run_attr_migration()</field>
+        <field eval="False" name="active"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field eval="False" name="doall"/>
+    </record>
+
+</odoo>

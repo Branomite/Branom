@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Portal Payments Breadcrumbs -->
+    <template id="portal_my_home_menu_payments" name="Portal layout : Account Payments"
+              inherit_id="portal.portal_breadcrumbs" priority="30">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'payments'" t-attf-class="breadcrumb-item #{'active ' if not payment else ''}">
+                <a t-if="payments" t-attf-href="/my/payments?{{ keep_query() }}">Account Payments</a>
+                <t t-if="payment"><a t-attf-href="/my/payments">Account Payments </a>  /  <span t-esc="payment.name"/></t>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Portal Home Payment Count Button -->
+    <template id="portal_my_home_payments" name="Portal My Home : Outstanding Credits"
+              inherit_id="portal.portal_my_home"
+              priority="35">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-if="payments_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Account Payments</t>
+                <t t-set="url" t-value="'/my/payments'"/>
+                <t t-set="count" t-value="payments_count"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Portal Payments List Page -->
+    <template id="portal_my_payments" name="My Payments">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Payments</t>
+            </t>
+            <t t-if="not payments">
+                <p>There are currently no payments for your account.</p>
+            </t>
+            <t t-if="payments" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Payment #</th>
+                        <th>Payment Date</th>
+                        <th>Status</th>
+                        <th class="text-right">Amount Paid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="payments" t-as="payment">
+                        <t t-if="payment.state not in ('draft')">
+                            <tr>
+                                <td>
+                                    <a href="#" class="payment_line_id" t-att-data-payment-id="payment.id"
+                                       t-att-title="payment.name">
+                                        <t t-esc="payment.name"/>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span t-field="payment.payment_date"/>
+                                </td>
+                                <td class="tx_status">
+                                    <t t-if="payment.state == 'draft'">
+                                        <span class="badge badge-pill badge-info">
+                                            <i class="fa fa-fw fa-print" aria-label="Draft" title="Draft" role="img"></i>
+                                            <span class="d-none d-md-inline">Draft</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="payment.state == 'posted'">
+                                        <span class="badge badge-pill badge-success">
+                                            <i class="fa fa-fw fa-check" aria-label="Validated" title="Validated"
+                                               role="img"></i>
+                                            <span class="d-none d-md-inline">Validated</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="payment.state == 'sent'">
+                                        <span class="badge badge-pill badge-info">
+                                            <i class="fa fa-fw fa-send" aria-label="Sent" title="Sent" role="img"></i>
+                                            <span class="d-none d-md-inline">Sent</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="payment.state == 'reconciled'">
+                                        <span class="badge badge-pill badge-success">
+                                            <i class="fa fa-fw fa-chain" aria-label="Reconciled" title="Reconciled"
+                                               role="img"></i>
+                                            <span class="d-none d-md-inline">Reconciled</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="payment.state == 'cancelled'">
+                                        <span class="badge badge-pill badge-warning">
+                                            <i class="fa fa-fw fa-remove" aria-label="Cancelled" title="Cancelled"
+                                               role="img"></i>
+                                            <span class="d-none d-md-inline">Cancelled</span>
+                                        </span>
+                                    </t>
+                                </td>
+                                <td class="text-right">
+                                    <span t-esc="payment.amount"
+                                          t-options='{"widget": "monetary", "display_currency": payment.currency_id}'/>
+                                </td>
+                            </tr>
+                        </t>
+                    </t>
+                </tbody>
+            </t>
+        </t>
+    </template>
+
+    <!-- Portal Payment Page -->
+    <template id="portal_payment_page" name="Payment Portal Template">
+        <t t-call="portal.portal_layout">
+            <div class="row mt16 o_portal_payment_sidebar">
+                <!-- Page Content -->
+                <div id="payment_content" class="col-12 col-lg">
+                    <div class="o_portal_html_view shadow bg-white p-3">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- Payment Status -->
+                                <div class="payment_status mb-1">
+                                    <t t-if="payment.state == 'draft'">
+                                        <span class="badge badge-pill badge-info mb-3">
+                                            <i class="fa fa-fw fa-print" aria-label="Draft" title="Draft"
+                                               role="img"></i>
+                                            <span class="d-none d-md-inline">Draft</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="payment.state == 'posted'">
+                                        <span class="badge badge-pill badge-success mb-3">
+                                            <i class="fa fa-fw fa-check" aria-label="Validated" title="Validated"
+                                               role="img"></i>
+                                            <span class="d-none d-md-inline">Validated</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="payment.state == 'sent'">
+                                        <span class="badge badge-pill badge-info mb-3">
+                                            <i class="fa fa-fw fa-send" aria-label="Sent" title="Sent" role="img"></i>
+                                            <span class="d-none d-md-inline">Sent</span>
+                                        </span>
+                                    </t>
+                                    <t t-if="payment.state == 'reconciled'">
+                                        <span class="badge badge-pill badge-success mb-3">
+                                            <i class="fa fa-fw fa-chain" aria-label="Reconciled" title="Reconciled"
+                                               role="img"></i>
+                                            <span class="d-none d-md-inline">Reconciled</span>
+                                        </span>
+                                    </t>
+                                    <!-- Heading -->
+                                    <h2>
+                                        <span t-esc="payment.name"/>
+                                    </h2>
+                                    <sup>Payment Token:
+                                        <span t-esc="payment.payment_token_id.name"/>
+                                    </sup>
+                                </div>
+                            </div>
+
+                            <!-- Payment Info Column -->
+                            <div class="payment_tx_info col-md-6">
+                                <p>
+                                    <strong>Payment Date:</strong>
+                                    <span t-esc="payment.payment_date"/>
+                                </p>
+
+                                <p>
+                                    <strong>Amount:</strong>
+                                    <span t-esc="payment.amount"
+                                          t-options='{"widget": "monetary", "display_currency": payment.currency_id}'/>
+                                </p>
+
+
+                            </div>
+                            <!-- Memo Column -->
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Memo:</strong>
+                                    <span t-esc="payment.communication"/>
+                                </p>
+                            </div>
+
+                            <div t-if="payment.reconciled_invoice_ids" class="col-md-12">
+                                <hr/>
+                            </div>
+
+                            <!-- Linked Invoices Column -->
+                            <div t-if="payment.reconciled_invoice_ids" class="col-md-12">
+                                <h4>Linked Invoices</h4>
+                                <hr />
+                                <t t-if="payment.reconciled_invoice_ids" t-call="portal.portal_table">
+                                    <thead>
+                                        <tr class="active">
+                                            <th>Invoice #</th>
+                                            <th>Invoice Date</th>
+                                            <th class="d-none d-md-table-cell">Due Date</th>
+                                            <th/>
+                                            <th class="text-right">Invoice Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <t t-foreach="payment.reconciled_invoice_ids" t-as="invoice">
+                                        <tr>
+                                            <td>
+                                                <t t-esc="invoice.name" t-if="invoice.name"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="invoice.invoice_date"/>
+                                            </td>
+                                            <td class='d-none d-md-table-cell'>
+                                                <span t-field="invoice.invoice_date_due"/>
+                                            </td>
+                                            <td class="tx_status">
+                                                <t t-if="invoice.state == 'open'">
+                                                    <span class="badge badge-pill badge-info">
+                                                        <i class="fa fa-fw fa-clock-o" aria-label="Opened"
+                                                           title="Opened" role="img"></i>
+                                                        <span class="d-none d-md-inline">Waiting for Payment</span>
+                                                    </span>
+                                                </t>
+                                                <t t-if="invoice.state == 'paid'">
+                                                    <span class="badge badge-pill badge-success">
+                                                        <i class="fa fa-fw fa-check" aria-label="Paid" title="Paid"
+                                                           role="img"></i>
+                                                        <span class="d-none d-md-inline">Paid</span>
+                                                    </span>
+                                                </t>
+                                                <t t-if="invoice.state == 'cancel'">
+                                                    <span class="badge badge-pill badge-warning">
+                                                        <i class="fa fa-fw fa-remove" aria-label="Cancelled"
+                                                           title="Cancelled" role="img"></i>
+                                                        <span class="d-none d-md-inline">Cancelled</span>
+                                                    </span>
+                                                </t>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="invoice.amount_total"
+                                                      t-options='{"widget": "monetary", "display_currency": invoice.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>
