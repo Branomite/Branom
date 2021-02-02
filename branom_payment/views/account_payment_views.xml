@@ -12,22 +12,22 @@
             </field>
         </record>
 
-	<!-- <record id="view_account_payment_form_inherit_branom" model="ir.ui.view">
-            <field name="name">account.payment.form.inherit.branom</field>
-            <field name="model">account.payment</field>
-            <field name="inherit_id" ref="account.view_account_payment_form"/>
-            <field name="arch" type="xml">
-	      <xpath expr="//field[@name='payment_transaction_id']" position="after">
-		<field name="refund_invoice_ids" mode="tree">
-		  <tree>
-		    <field name="display_name"/>
-		    <field name="amount_total"/>
-              <!-- TODO Missing field "residual" on `account.payment` in Odoo 13.0 -->
-<!--		    <field name="residual"/>-->
-		  </tree>
-		</field>
-	      </xpath>
-            </field>
-        </record> -->
+<!--	<record id="view_account_payment_form_inherit_branom" model="ir.ui.view">-->
+<!--            <field name="name">account.payment.form.inherit.branom</field>-->
+<!--            <field name="model">account.payment</field>-->
+<!--            <field name="inherit_id" ref="account.view_account_payment_form"/>-->
+<!--            <field name="arch" type="xml">-->
+<!--	      <xpath expr="//field[@name='payment_transaction_id']" position="after">-->
+<!--		<field name="refund_invoice_ids" mode="tree">-->
+<!--		  <tree>-->
+<!--		    <field name="display_name"/>-->
+<!--		    <field name="amount_total"/>-->
+<!--              &lt;!&ndash; TODO Missing field "residual" on `account.payment` in Odoo 13.0 &ndash;&gt;-->
+<!--&lt;!&ndash;		    <field name="residual"/>&ndash;&gt;-->
+<!--		  </tree>-->
+<!--		</field>-->
+<!--	      </xpath>-->
+<!--            </field>-->
+<!--        </record>-->
     </data>
 </odoo>
