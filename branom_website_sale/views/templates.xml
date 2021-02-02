@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="product_inherit" inherit_id="website_sale.product">
+        <hr t-if="product.description_sale" position="attributes">
+            <attribute name="t-if">product.description_sale or product.default_code</attribute>
+        </hr>
+        <xpath expr="//p[@t-field='product.description_sale']" position="before">
+            <p itemprop="default_code" t-att-content="product.default_code" t-field="product.default_code"
+                 t-att-class="brnm_sale_default_code_desc"/>
+        </xpath>
+    </template>
+
+    <template id="products_item_inherit" inherit_id="website_sale.products_item">
+        <xpath expr="//*[hasclass('o_wsale_products_item_title')]/a[@itemprop='name']" position="after">
+            <p itemprop="default_code" t-att-content="product.default_code" t-field="product.default_code" t-att-class="brnm_sale_default_code"/>
+        </xpath>
+    </template>
+
+    <template id="products_inherit_show_categories" inherit_id="website_sale.products" name="Show Product Categories">
+        <xpath expr="//div[@id='category_header']" position="after">
+            <t t-call="branom_website_sale.sub_category_links"/>
+        </xpath>
+    </template>
+
+    <template id="sub_category_links" name="Sub-Category Links">
+        <div t-if="category.child_id and pager['page']['num'] == 1" id="brnm_category_grid" class="container brnm_category_grid">
+            <div class="row">
+                <t t-foreach="category.child_id" t-as="sub_cat">
+                    <t t-set="cat_href" t-value="keep('/shop/category/' + slug(sub_cat), category=0)"/>
+
+                    <div class="col-xs-12 col-sm-6 col-md-3 mb-3">
+                        <div class="brnm_subcat_card card h-100 text-center">
+                            <div class="card-body p-1">
+                                <a t-att-href="cat_href" class="d-block h-100" itemprop="url">
+                                    <span t-field="sub_cat.image_128"
+                                          t-options="{'widget': 'image'}"
+                                          class="justify-content-center align-items-center"/>
+                                </a>
+
+                            </div>
+                            <div class="brnm_subcat_name card-body p-0 d-flex justify-content-center align-items-center">
+                                <div class="p-2">
+                                    <h4>
+                                        <a itemprop="name" t-att-href="cat_href" t-att-content="sub_cat.name"
+                                           t-field="sub_cat.name"/>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </div>
+            <hr/>
+            <h2>Products in <t t-esc="category.display_name"></t></h2>
+        </div>
+    </template>
+
+
+    <template id="sub_category_links_delete" name="Sub-Category Links">
+        <div t-if="category.child_id and pager['page']['num'] == 1" id="brnm_category_grid" class="o_wsale_products_grid_table_wrapper brnm_category_grid">
+            <t t-set="cat_rows" t-value="len(category.child_id) // ppr"/>
+            <t t-if="len(category.child_id) % ppr &gt; 0">
+                <t t-set="cat_rows" t-value="cat_rows + 1"/>
+            </t>
+<!--            <p>Rows: <span t-esc="cat_rows"/></p>-->
+            <table class="table table-borderless m-0" t-att-data-ppr="ppr">
+                <colgroup t-ignore="true">
+                    <!-- Force the number of columns (useful when only one row of (x < ppr) products) -->
+                    <col t-foreach="ppr" t-as="p"/>
+                </colgroup>
+                <tbody>
+                    <tr t-foreach="map(lambda x: x * ppr, range(cat_rows))" t-as="start_index">
+                        <td t-foreach="category.child_id[start_index:start_index + ppr]" t-as="sub_cat" t-attf-class="oe_product">
+                            <t t-set="cat_href" t-value="keep('/shop/category/' + slug(sub_cat), category=0)"/>
+                            <div class="o_wsale_product_grid_wrapper o_wsale_product_grid_wrapper_1_1">
+                                <div class="card oe_product_cart">
+                                    <div class="card-body p-1 oe_product_image">
+                                        <!--                        <div class="ribbon-wrapper">-->
+                                        <!--                            <a href="#" role="button" class="ribbon btn btn-danger">Sale</a>-->
+                                        <!--                        </div>-->
+                                        <a t-att-href="cat_href" class="d-block h-100" itemprop="url">
+                                            <span t-field="sub_cat.image_1920"
+                                                  t-options="{'widget': 'image', 'preview_image': 'image_256'}"
+                                                  class="d-flex h-100 justify-content-center align-items-center"/>
+                                        </a>
+                                    </div>
+                                    <div class="card-body p-0 text-center o_wsale_product_information">
+                                        <div class="p-2 o_wsale_product_information_text">
+                                            <h4 class="o_wsale_products_item_title">
+                                                <a itemprop="name" t-att-href="cat_href" t-att-content="sub_cat.name" t-field="sub_cat.name"/>
+                                            </h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <hr/>
+        </div>
+    </template>
+
+</odoo>
