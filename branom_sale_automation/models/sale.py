@@ -21,6 +21,8 @@ class SaleOrder(models.Model):
                 order.percent_delivered = (qty_delivered / qty_ordered) * 100.0
             # if the delivery is 'essentially complete', increment delivered qty on delivery product
             if 99.5 <= order.percent_delivered <= 100.5:
-                delivery_line = order.order_line.filtered(lambda l: l.is_delivery)
-                if delivery_line.product_uom_qty != delivery_line.qty_delivered:
-                    delivery_line.qty_delivered = delivery_line.product_uom_qty
+                # some orders have more than one delivery line!
+                delivery_lines = order.order_line.filtered(lambda l: l.is_delivery)
+                for delivery_line in delivery_lines:
+                    if delivery_line.product_uom_qty != delivery_line.qty_delivered:
+                        delivery_line.qty_delivered = delivery_line.product_uom_qty
