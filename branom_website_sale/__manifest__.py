@@ -13,9 +13,12 @@ Customizations to website_sale
         'website_sale',
     ],
     'data': [
+        'views/account_portal_payment_templates.xml',
+        'views/payment_templates.xml',
         'views/quick_order_templates.xml',
         'views/templates.xml',
         'views/web_assets.xml',
+        'views/website_views.xml',
     ],
     'installable': True,
     'application': False,

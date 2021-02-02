@@ -1,21 +1,16 @@
 odoo.define('branom_website_sale.quick_order', function (require) {
     require('web.dom_ready');
-
     var ajax = require('web.ajax');
-
-    // $(document).ready(function () {
     console.log('Quick Order version 1.0.8');
 
     function validateForm() {
         // if form valid
-        console.log('validateForm');
         var is_invalid_count = $('input.brnm_sku_input.is-invalid').length;
         var is_valid_count = $('input.brnm_sku_input.is-valid').length;
         if ((is_invalid_count == 0) && (is_valid_count > 0)) {
-            console.log('enabling submit');
-            $('#brnm_qo_add_to_cart').prop('disabled', false);
+            $('.brnm_qo_add_to_cart').prop('disabled', false);
         } else {
-            $('#brnm_qo_add_to_cart').prop('disabled', 'disabled');
+            $('.brnm_qo_add_to_cart').prop('disabled', 'disabled');
         }
     };
 
@@ -24,19 +19,26 @@ odoo.define('branom_website_sale.quick_order', function (require) {
         var sku_input = $(sku_input);
 
         sku_input.on('focusout', function (e) {
+            $(e.currentTarget).val(function (index, value) {
+                return value.trim();
+            });
             var sku = $(e.currentTarget).val();
-            console.log('sku:', sku);
+            //console.log('sku:', sku);
             if (sku) {
                 var data = {'sku': sku};
                 //console.log(data);
                 ajax.jsonRpc('/quick-order/validate', 'call', data).then(function (result) {
-                    console.log(result);
-                    if (result === true) {
+                    var validation_msg = sku_input.next('.brnm_qo_feedback');
+                    if (result.success) {
                         //row.attr('sku_validated', true);
                         sku_input.removeClass('is-invalid').addClass('is-valid');
+                        validation_msg.removeClass('invalid-feedback').addClass('valid-feedback');
+                        validation_msg.text(result.message);
                     } else {
                         //row.attr('sku_validated', false);
                         sku_input.removeClass('is-valid').addClass('is-invalid');
+                        validation_msg.removeClass('valid-feedback').addClass('invalid-feedback');
+                        validation_msg.text('Product not found.');
                     }
                     validateForm();
                 });
@@ -54,7 +56,7 @@ odoo.define('branom_website_sale.quick_order', function (require) {
 
     // add new row
     function addRowCallback(e) {
-        console.log('Adding row');
+        //console.log('Adding row');
 
         var row = $('.quick_order_row:last').clone();
         var line_num = row.data('lineNum') + 1;
@@ -70,14 +72,14 @@ odoo.define('branom_website_sale.quick_order', function (require) {
                 $el.attr('name', 'item_qty_' + line_num);
             }
         });
-        row.appendTo('#quick_order_lines');
+        row.appendTo('.quick_order_lines');
     }
 
-    $('#brnm_qo_add_item').on('click', addRowCallback);
+    $('.brnm_qo_add_item').on('click', addRowCallback);
 
     function formSubmitCallback(e) {
         e.preventDefault();
-        $('#brnm_qo_add_to_cart').prop('disabled', true);
+        $('.brnm_qo_add_to_cart').prop('disabled', true);
         console.log('brnm_quickorder_form submitted');
         var form_data = $(this).serializeArray();
         //console.log(form_data);
@@ -98,14 +100,12 @@ odoo.define('branom_website_sale.quick_order', function (require) {
         console.log(products);
 
         ajax.jsonRpc('/quick-order/add-items', 'call', {'products': products}).then(function (result) {
-            console.log('result:');
-            console.log(result);
             if (result.success) {
                 window.location.replace('/shop/cart');
             } else {
                 // display errors
                 if ('errors' in result) {
-                    var alert = $('#brnm_qo_errors');
+                    var alert = $('.brnm_qo_errors');
                     var err_list = alert.find('ul');
                     err_list.empty();
                     result.errors.forEach(function (err) {
@@ -120,7 +120,7 @@ odoo.define('branom_website_sale.quick_order', function (require) {
         });
     }
 
-    $('#brnm_quickorder_form').on('submit', formSubmitCallback);
+    $('.brnm_quickorder_form').on('submit', formSubmitCallback);
 
     return {
         bindSKUValidation: bindSKUValidation,
