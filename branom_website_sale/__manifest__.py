@@ -16,6 +16,7 @@ Customizations to website_sale
     'data': [
         'views/account_portal_payment_templates.xml',
         'views/payment_templates.xml',
+        'views/product_views.xml',
         'views/quick_order_templates.xml',
         'views/templates.xml',
         'views/save_products_templates.xml',
