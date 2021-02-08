@@ -5,10 +5,6 @@ from odoo.addons.http_routing.models.ir_http import slug
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.addons.website_sale.controllers.main import WebsiteSale, TableCompute
 from odoo.osv import expression
-import logging
-
-
-_logger = logging.getLogger(__name__)
 
 
 class BranomWebsiteSale(WebsiteSale):
@@ -19,6 +15,8 @@ class BranomWebsiteSale(WebsiteSale):
         '''/shop/category/<model("product.public.category"):category>/page/<int:page>'''
     ], type='http', auth="public", website=True, sitemap=WebsiteSale.sitemap_shop)
     def shop(self, page=0, category=None, search='', ppg=False, **post):
+        # Core method override
+
         add_qty = int(post.get('add_qty', 1))
         Category = request.env['product.public.category']
         if category:
@@ -44,8 +42,8 @@ class BranomWebsiteSale(WebsiteSale):
         attributes_ids = {v[0] for v in attrib_values}
         attrib_set = {v[1] for v in attrib_values}
 
+        # ideally we could override _get_search_domain, but it doesn't take post as an argument
         domain = self._get_search_domain(search, category, attrib_values)
-        _logger.warning('domain: %s' % domain)
         manufacturer = post.get('mfg')
         if manufacturer:
             try:
@@ -54,9 +52,6 @@ class BranomWebsiteSale(WebsiteSale):
                 manufacturer = None
         if manufacturer:
             domain = expression.AND([[('manufacturer_id', '=', manufacturer.id)], domain])
-
-        _logger.warning('new domain: %s' % domain)
-
 
         keep = QueryURL('/shop', category=category and int(category), search=search, attrib=attrib_list,
                         order=post.get('order'))
