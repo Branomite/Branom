@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Button for /my/home -->
+    <template id="make_account_portal_payment_button" inherit_id="portal.portal_layout">
+        <xpath expr="//div[hasclass('o_portal_my_details')]" position="after">
+            <div>
+                <a role="button" href="/my/account/delivery/methods" class="mt-3 mb-3">
+                    Manage Shipping Accounts
+                </a>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>
