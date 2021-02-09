@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="brnm_shipping_manager_assets_frontend" inherit_id="website.assets_frontend">
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript" src="/branom_website_partner_delivery/static/src/js/shipping_account_manager.js"></script>
+            <script type="text/javascript" src="/branom_website_partner_delivery/static/src/js/website_sale_delivery_checkout.js"></script>
+        </xpath>
+    </template>
+</odoo>
