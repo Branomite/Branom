@@ -243,4 +243,13 @@
         </t>
     </template>
 
+    <template id="confirmation" inherit_id="website_sale.confirmation">
+        <xpath expr="//div[@id='oe_structure_website_sale_confirmation_2']" position="before">
+            <div t-if="order.has_service_product" id="brnm_alert_service_request" class="alert alert-warning mt-3" role="alert">
+                <b>Your order contains service products:</b>
+                <span>Please fill out the <a href="/service">service request form.</a></span>
+            </div>
+        </xpath>
+    </template>
+
 </odoo>
