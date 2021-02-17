@@ -101,7 +101,7 @@ odoo.define('branom_website_sale.quick_order', function (require) {
 
         ajax.jsonRpc('/quick-order/add-items', 'call', {'products': products}).then(function (result) {
             if (result.success) {
-                window.location.replace('/shop/cart');
+                window.location.replace(result.redirect_url);
             } else {
                 // display errors
                 if ('errors' in result) {
