@@ -6,6 +6,12 @@ class SaleOrder(models.Model):
 
     rfq_line_ids = fields.One2many('sale.order.rfq.line', 'order_id')
     partner_industry = fields.Char('Industry')
+    rfq_quantity = fields.Integer(compute='_compute_rfq_info', string='RFQ Quantity')
+
+    @api.depends('rfq_line_ids.request_qty', 'rfq_line_ids.product_id')
+    def _compute_rfq_info(self):
+        for order in self:
+            order.rfq_quantity = int(sum(order.mapped('rfq_line_ids.request_qty')))
 
     @api.model
     def check_so_line_rfq(self):
