@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Portal Shipping Accounts Breadcrumbs -->
+    <template id="portal_my_home_menu_shipping Accounts" name="Portal layout : Shipping Account Crumbs"
+              inherit_id="portal.portal_breadcrumbs" priority="35">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'shipping_accounts'"
+                t-attf-class="breadcrumb-item #{'active ' if not shipping_accounts else ''}">
+                <a t-if="shipping_accounts_count" t-attf-href="/my/account/delivery/methods">Shipping Accounts</a>
+            </li>
+        </xpath>
+    </template>
+
+    <!-- Portal Shipping Accounts Count Button -->
+    <template id="portal_my_home_shipping_accounts" name="Portal My Home : Shipping Accounts Count"
+              inherit_id="portal.portal_my_home"
+              priority="45">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-if="shipping_accounts_count" t-call="portal.portal_docs_entry">
+                <t t-set="title">Shipping Accounts</t>
+                <t t-set="url" t-value="'/my/account/delivery/methods'"/>
+                <t t-set="count" t-value="shipping_accounts_count"/>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="manage_shipping_accounts" name="Portal layout: Manage Shipping Accounts">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Shipping Accounts</t>
+            </t>
+
+            <h4 class="mt8">Manage your shipping accounts</h4>
+            <p class="text-muted">Add your Fedex or UPS shipping accounts here to select at checkout.</p>
+
+            <t t-if="not accounts">
+                <p>There are currently no saved shipping accounts.</p>
+            </t>
+            <t t-if="accounts" t-call="portal.portal_table">
+                <thead>
+                    <tr class="active">
+                        <th>Name</th>
+                        <th>Account #</th>
+                        <th class="text-right">Carrier</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="accounts" t-as="account">
+                        <tr>
+
+                            <td>
+                                <t t-esc="account.description"/>
+                            </td>
+
+                            <td class="text-capitalize">
+                                <t t-esc="account.name"/>
+                            </td>
+
+                            <td class="text-right text-capitalize">
+                                <t t-esc="account.delivery_type"/>
+                            </td>
+
+                            <td class="text-right">
+                                <a href="#" class="shipping_account_update_btn btn btn-warning"
+                                   t-att-data-record_id="account.id" data-operation="edit"
+                                   t-att-data-partner_id="partner.id">
+                                    <i class="fa fa-edit text-white"></i>
+                                </a>
+                                <a href="#" class="shipping_account_update_btn btn btn-danger"
+                                   t-att-data-record_id="account.id" data-operation="delete"
+                                   t-att-data-partner_id="partner.id">
+                                    <i class="fa fa-trash text-white"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </t>
+            <!-- Allow Adding a shipping Account to table -->
+            <a href="#" class="btn btn-info mt16 mb16 shipping_account_update_btn"
+               data-record_id="new" data-operation="create" t-att-data-partner_id="partner.id">
+                <i class="fa fa-plus"></i>
+                Add Shipping Account
+            </a>
+            <t t-call="branom_website_partner_delivery.modal_manage_shipping_accounts"/>
+        </t>
+    </template>
+
+    <!-- Modal popup used to manage accounts -->
+    <template id="modal_manage_shipping_accounts" name="Portal layout: Shipping Accounts Modal">
+        <div class="modal fade" id="modal_shipping_account_manager" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 id="modal-operation" class="mb0"/>
+                    </div>
+                    <div class="modal-body">
+                        <form id="modal_shipping_account_form" role="form">
+                            <!-- Where JS will render the form HTML from the template below -->
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div id="shipping_form_placeholder"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-default btn-success btn-block">
+                                <i class="fa fa-check-square text-white"></i>
+                                Submit
+                            </button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" type="submit" class="btn btn-default btn-danger" data-dismiss="modal">
+                            <i class="fa fa-close text-white"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="modal_form_data" name="Shipping Account Modal Form Data">
+        <div class="form-group">
+            <input name="partner_id" type="hidden" t-att-value="partner_id"/>
+            <input name="operation" type="hidden" t-att-value="operation"/>
+            <!-- Pre-fill if a record is provided -->
+            <t t-if="record and (operation != 'delete')">
+                <input name="record_id" type="hidden" t-att-value="record.id"/>
+                <label for="description" class="mt8">Description</label>
+                <br/>
+                <input name="description" type="text" t-att-value="record.description" class="mb8 w-100"/>
+                <br/>
+                <label for="name" class="mt8">Account #</label>
+                <br/>
+                <input name="name" type="text" t-att-value="record.name" class="mb8 w-100"/>
+                <br/>
+                <label for="delivery_type" class="mt8">Carrier</label>
+                <select name="delivery_type" class="form-control o_website_form_input text-capitalize">
+                    <option t-att-value="record.delivery_type">
+                        <t t-esc="record.delivery_type"/>
+                    </option>
+                </select>
+                <label for="account_zip" class="mt8">Account Zip Code</label>
+                <input name="account_zip" type="text" t-att-value="record.ups_zip or ''" class="mb8 w-100"/>
+                <p class="text-muted">Required for UPS</p>
+                <br/>
+            </t>
+
+            <t t-elif="record and (operation == 'delete')">
+                <input name="record_id" type="hidden" t-att-value="record.id"/>
+                <p>Are you sure you want to delete <t t-esc="record.description"/>?</p>
+            </t>
+
+            <t t-else="">
+                <label for="description" class="mt8">Description</label>
+                <br/>
+                <input name="description" type="text" class="mb8 w-100"/>
+                <br/>
+                <label for="name" class="mt8">Account #</label>
+                <br/>
+                <input name="name" type="text" class="mb8 w-100"/>
+                <br/>
+                <label for="delivery_type" class="mt8">Carrier</label>
+                <select name="delivery_type" class="form-control o_website_form_input text-capitalize">
+                    <option value="fedex">
+                        Fedex
+                    </option>
+                    <option value="ups">
+                        UPS
+                    </option>
+                </select>
+                <label for="account_zip" class="mt8">Account Zip Code</label>
+                <input name="account_zip" type="text" class="mb8 w-100"/>
+                <p class="text-muted">Required for UPS</p>
+                <br/>
+            </t>
+        </div>
+    </template>
+
+</odoo>
