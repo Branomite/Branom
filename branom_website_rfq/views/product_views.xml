@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="website_sale_product_template_form_view_inherit">
+        <field name="name">website.sale.product.template.form.view.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="website_sale.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='website_id']" position="after">
+                <field name="rfq_enabled" string="Request for Quote"/>
+            </xpath>
+            <xpath expr="//group[@name='shop']" position="after">
+                <group name="sale_restrict" attrs="{'invisible': [('rfq_enabled', '!=', True)]}">
+                    <group string="Allow Sales by Location">
+                        <field name="restrict_sale_loc_tmpl"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
