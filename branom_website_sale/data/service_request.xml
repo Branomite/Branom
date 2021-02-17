@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+
+    <record id="service_request_tag" model="crm.lead.tag">
+        <field name="name">Service Request</field>
+        <field name="color">5</field>
+    </record>
+
+</odoo>
