@@ -12,6 +12,7 @@ Customizations to website_sale
         'sale',
         'website_sale',
         'website_sale_wishlist',
+        'branom_website_rfq',
     ],
     'data': [
         'views/account_portal_payment_templates.xml',
