@@ -24,7 +24,7 @@
 
                 <div class="card" style="margin-left: 9px; margin-right: 9px;">
                     <div class="card-header" style="text-align: center;">
-                        <t t-esc="request.website.get_current_website().header"/>
+                        <t t-esc="request.website.get_current_website().abtp_header"/>
                     </div>
                 </div><br></br>
                 <div id="also-bought-products" class="owl-carousel">

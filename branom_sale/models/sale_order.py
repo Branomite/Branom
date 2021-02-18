@@ -66,6 +66,7 @@ class SaleOrderLine(models.Model):
         res['price_unit'] = res['price_unit'] - \
             (res['price_unit'] * (res['discount'] / 100.0))
         res['discount'] = 0.0
+        return res
 
     def get_sale_order_line_multiline_description_sale(self, product):
         if not product.attribute_line_ids.value_ids:

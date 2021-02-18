@@ -20,7 +20,7 @@ class Website(models.Model):
 		help="Add the products automatically to the also bought on the purchase"
 	)
 
-	header = fields.Char(
+	abtp_header = fields.Char(
 		string="Header Message",
-		required=True,
+		default="CUSTOMERS WHO BOUGHT THIS ITEM ALSO BOUGHT"
 	)
