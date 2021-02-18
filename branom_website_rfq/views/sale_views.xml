@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record model="ir.ui.view" id="rfq_sale_order_form_view_inherit">
+        <field name="name">sale.order.form.rfq.view.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[last()]" position="after">
+                <page string="RFQ Lines" name="rfq_lines">
+                    <field name="rfq_line_ids" widget="section_and_note_one2many" mode="tree">
+                        <tree editable="0">
+                            <field name="product_id"/>
+                            <field name="request_qty"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

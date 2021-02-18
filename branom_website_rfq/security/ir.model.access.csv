@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+manage_sale_order_rfq_line,manage_sale_order_rfq_line,model_sale_order_rfq_line,sales_team.group_sale_manager,1,1,1,1
+access_sale_order_rfq_line,access_sale_order_rfq_line,model_sale_order_rfq_line,base.group_user,1,1,1,0
+public_sale_order_rfq_line,public_sale_order_rfq_line,model_sale_order_rfq_line,base.group_user,1,0,0,0
+portal_sale_order_rfq_line,portal_sale_order_rfq_line,model_sale_order_rfq_line,base.group_portal,1,0,0,0
+manage_sale_product_sale_restrict,manage_product_sale_restrict,model_product_sale_restrict,sales_team.group_sale_manager,1,1,1,1
+access_sale_product_sale_restrict,access_product_sale_restrict,model_product_sale_restrict,base.group_user,1,1,1,0
+public_sale_product_sale_restrict,public_product_sale_restrict,model_product_sale_restrict,base.public_user,1,0,0,0
+portal_sale_product_sale_restrict,portal_product_sale_restrict,model_product_sale_restrict,base.group_portal,1,0,0,0

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!-- Copyright (c) 2018-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+    <data>
+        <record id="also_bought_products_id" model="ir.ui.view">
+            <field name="name">Also Bought Products</field>
+            <field name="model">also.bought.products.conf</field>
+            <field name="arch" type="xml">
+               <form string="Also Bought Products" class="oe_form_configuration">
+                    <group>
+                        <field name="use_automatic"/>
+                        <field name="header"/>
+                    </group>
+                    <footer>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel" class="btn-default"/>
+                    </footer>
+                </form> 
+            </field>
+        </record>
+        <record id="action_also_bought_products" model="ir.actions.act_window">
+            <field name="name">Also Bought Products</field>
+            <field name="res_model">also.bought.products.conf</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Wishlist/Save for Later View -->
+    <template id="website_sale_wishlist_inherit" inherit_id="website_sale_wishlist.product_wishlist">
+        <!-- Cannot use position="attributes" and <attribute name='t-foreach'...</> unfortunately -->
+        <xpath expr="//t[@t-foreach='wishes']" position="replace">
+            <t t-foreach="wishes.filtered(lambda l: l.product_id.product_tmpl_id.is_rfq_product(request.env.user.partner_id))"
+               t-as="wish"> <!-- FILTER ADDED HERE -->
+                <tr t-att-data-wish-id='wish.id' t-att-data-product-id='wish.product_id.id'>
+                    <td class='td-img'>
+                        <a t-att-href="wish.product_id.website_url">
+                            <img t-attf-src="/web/image/product.product/#{wish.product_id.id}/image_128"
+                                 class="img img-fluid" style="margin:auto;" alt="Product image"/>
+                        </a>
+                    </td>
+                    <td class='text-left'>
+                        <strong>
+                            <a t-att-href="wish.product_id.website_url">
+                                <t t-esc="wish.product_id.display_name"/>
+                            </a>
+                        </strong>
+                        <small class='d-none d-md-block'>
+                            <p t-field="wish.product_id.description_sale" class="text-muted"/>
+                        </small>
+                        <button type="button" class="btn btn-link o_wish_rm no-decoration">
+                            <small>
+                                <i class='fa fa-trash-o'></i>
+                                Remove
+                            </small>
+                        </button>
+                    </td>
+                    <td>
+                        <t t-set="combination_info"
+                           t-value="wish.product_id._get_combination_info_variant()"/>
+                        <t t-esc="combination_info['price']"
+                           t-options="{'widget': 'monetary', 'display_currency': website.pricelist_id.currency_id}"/>
+                    </td>
+                    <td class='text-center td-wish-btn'>
+                        <input name="product_id" t-att-value="wish.product_id.id" type="hidden"/>
+                        <button type="button" role="button"
+                                class="btn btn-secondary btn-block o_wish_add mb4">Add
+                            <span class='d-none d-md-inline'>to Cart</span>
+                        </button>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+        <xpath expr="//div[hasclass('oe_website_sale')]" position="inside">
+            <t t-set="rfq_wishes" t-value="wishes.filtered(lambda l: not l.product_id.product_tmpl_id.is_rfq_product(request.env.user.partner_id))"/>
+            <section t-if="rfq_wishes" class="container wishlist-section">
+                <h3>My RFQ Products</h3>
+                <table class="table table-bordered table-striped table-hover text-center mt16 table-comparator "
+                       style="table-layout:auto" id="o_comparelist_table">
+                    <body>
+                        <t t-foreach="rfq_wishes"
+                           t-as="wish"> <!-- FILTER ADDED HERE -->
+                            <tr t-att-data-wish-id='wish.id' t-att-data-product-id='wish.product_id.id'>
+                                <td class='td-img'>
+                                    <a t-att-href="wish.product_id.website_url">
+                                        <img t-attf-src="/web/image/product.product/#{wish.product_id.id}/image_128"
+                                             class="img img-fluid" style="margin:auto;" alt="Product image"/>
+                                    </a>
+                                </td>
+                                <td class='text-left'>
+                                    <strong>
+                                        <a t-att-href="wish.product_id.website_url">
+                                            <t t-esc="wish.product_id.display_name"/>
+                                        </a>
+                                    </strong>
+                                    <small class='d-none d-md-block'>
+                                        <p t-field="wish.product_id.description_sale" class="text-muted"/>
+                                    </small>
+                                    <button type="button" class="btn btn-link o_wish_rm no-decoration">
+                                        <small>
+                                            <i class='fa fa-trash-o'></i>
+                                            Remove
+                                        </small>
+                                    </button>
+                                </td>
+                                <td>
+                                    <t t-set="combination_info"
+                                       t-value="wish.product_id._get_combination_info_variant()"/>
+                                    <t t-esc="combination_info['price']"
+                                       t-options="{'widget': 'monetary', 'display_currency': website.pricelist_id.currency_id}"/>
+                                </td>
+                                <td class='text-center td-wish-btn'>
+                                    <input name="product_id" t-att-value="wish.product_id.id" type="hidden"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </body>
+                </table>
+            </section>
+        </xpath>
+    </template>
+
+    <!-- Product View -->
+    <template id="website_sale_product_rfq" inherit_id="website_sale.product">
+        <xpath expr="//div[@id='product_details']" position="replace">
+            <t t-if="website">
+                <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
+                <t t-set="rfq_product" t-value="product.is_rfq_product(partner)"/>
+            </t>
+            <t t-else="">
+                <t t-set="website_sale_order" t-value="False"/>
+                <t t-set="rfq_product" t-value="False"/>
+            </t>
+            <div class="col-md-6 col-xl-4" id="product_details">
+                <h1 itemprop="name" t-field="product.name">Product Name</h1>
+                <span itemprop="url" style="display:none;" t-esc="product.website_url"/>
+                <form t-if="product._is_add_to_cart_possible()" action="/shop/cart/update" method="POST">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="js_product js_main_product">
+                        <t t-placeholder="select">
+                            <input type="hidden" class="product_id" name="product_id" t-att-value="product_variant.id"/>
+                            <input type="hidden" class="product_template_id" name="product_template_id"
+                                   t-att-value="product.id"/>
+                            <t t-if="combination" t-call="sale.variants">
+                                <t t-set="ul_class" t-value="'flex-column'"/>
+                                <t t-set="parent_combination" t-value="None"/>
+                            </t>
+                            <t t-else="">
+                                <ul class="d-none js_add_cart_variants"
+                                    t-att-data-attribute_exclusions="{'exclusions: []'}"/>
+                            </t>
+                        </t>
+                        <t t-if="rfq_product" t-call="website_sale.product_price"/>
+                        <p t-if="True" class="css_not_available_msg alert alert-warning">This combination does not
+                            exist.
+                        </p>
+                        <a t-if="rfq_product" role="button" id="add_to_cart"
+                           class="btn btn-primary btn-lg mt16 js_check_product a-submit d-block d-sm-inline-block"
+                           href="#">
+                            <i class="fa fa-shopping-cart"/>
+                            Add to Cart
+                        </a>
+                        <a t-else="not rfq_product" role="button" id="add_to_quote" t-att-data-id="product.id"
+                           class="btn btn-primary btn-lg mt16 d-block d-sm-inline-block"
+                           href="#">
+                            <i class="fa fa-file-text-o"/>
+                            Request Quote
+                        </a>
+                        <div t-if="rfq_product" id="product_option_block"/>
+                    </div>
+                </form>
+                <p t-elif="not product.active" class="alert alert-warning">This product is no longer available.</p>
+                <p t-elif="not product._check_buffer_available()" class="alert alert-warning">Out of stock</p>
+                <p t-else="" class="alert alert-warning">This product has no valid combination.</p>
+                <hr t-if="product.description_sale"/>
+                <div>
+                    <p t-field="product.description_sale" class="text-muted mt-3"
+                       placeholder="A short description that will also appear on documents."/>
+                    <div id="product_attributes_simple">
+                        <hr t-if="sum([(1 if len(l.value_ids)==1 else 0) for l in product.attribute_line_ids])"/>
+                        <p class="text-muted">
+                            <t t-set="single_value_attributes"
+                               t-value="product.valid_product_template_attribute_line_ids._prepare_single_value_for_display()"/>
+                            <t t-foreach="single_value_attributes" t-as="attribute">
+                                <span t-field="attribute.name"/>:
+                                <t t-foreach="single_value_attributes[attribute]" t-as="ptal">
+                                    <span t-field="ptal.product_template_value_ids._only_active().name"/>
+                                    <t t-if="not ptal_last">,</t>
+                                </t>
+                                <br/>
+                            </t>
+                        </p>
+                    </div>
+                </div>
+                <hr/>
+                <p class="text-muted">
+                    30-day money-back guarantee
+                    <br/>
+                    Free Shipping in U.S.
+                    <br/>
+                    Buy now, get in 2 days
+                </p>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Request Quote Table -->
+    <template id="rfq_table">
+        <table t-if="website_sale_order.rfq_line_ids"
+               class="mb16 table table-striped table-sm js_cart_lines" id="rfq_products">
+            <thead>
+                <tr>
+                    <th class="td-img">Product</th>
+                    <th></th>
+                    <th class="text-center td-qty">Quantity</th>
+                    <th></th>
+                    <th class="text-center td-action"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <t t-foreach="website_sale_order.rfq_line_ids" t-as="line">
+                    <tr t-if="line">
+                        <td colspan="2" t-if="not line.product_id" class='td-img'></td>
+                        <td align="center" t-if="line.product_id" class='td-img'>
+                            <span t-field="line.product_id.image_128"
+                                  t-options="{'widget': 'image', 'qweb_img_responsive': False, 'class': 'rounded o_image_64_max'}"/>
+                        </td>
+                        <td t-if="line.product_id" class='td-product_name'>
+                            <div>
+                                <!-- TODO: AttributeError: 'sale.order.rfq.line' object has no attribute 'event_id' from studio field  -->
+<!--                                <t t-call="website_sale.cart_line_product_link">-->
+<!--                                    <strong t-field="line.product_id.name"/>-->
+<!--                                </t>-->
+                                <strong t-field="line.product_id.name"/>
+                            </div>
+                        </td>
+                        <td class="text-center td-qty">
+                            <div class="css_quantity input-group mx-auto">
+                                <input type="text" class="js_rfq_quantity_input form-control quantity text-centered"
+                                       t-att-data-line-id="line.id" t-att-data-product-id="line.product_id.id"
+                                       t-att-value="int(line.request_qty) == line.request_qty and int(line.request_qty) or line.request_qty"/>
+                            </div>
+                        </td>
+                        <td class="td-action">
+                            <a href='#' aria-label="Remove from quote" title="Remove from cart"
+                               class='js_delete_rfq_product no-decoration' t-att-data-product-id="line.product_id.id">
+                                <small>
+                                    <i class='fa fa-trash-o'></i>
+                                </small>
+                            </a>
+                        </td>
+                    </tr>
+                </t>
+            </tbody>
+        </table>
+        <p class="text-muted">
+            Once you submit the RFQ for the above items,
+            you will receive a confirmation email and our sales team will respond with a quote as soon as possible.
+            If you do not wish to submit a quote at this time, remove the items from your cart by using the Save for
+            Later button.
+        </p>
+    </template>
+
+    <!-- Cart Summary - Right Column -->
+    <template id="website_sale_cart_summary_inherit" inherit_id="website_sale.cart_summary">
+        <xpath expr="//tbody" position="replace">
+            <tbody>
+                <tr t-foreach="website_sale_order.website_order_line" t-as="line">
+                    <t t-if="not line.product_id.rfq_enabled">
+                        <td class='' colspan="2" t-if="not line.product_id.product_tmpl_id"></td>
+                        <td class='td-img text-center' t-if="line.product_id.product_tmpl_id">
+                            <span t-field="line.product_id.image_128"
+                                  t-options="{'widget': 'image', 'qweb_img_responsive': False, 'class': 'rounded o_image_64_max'}"/>
+                        </td>
+                        <td class='td-product_name' t-if="line.product_id.product_tmpl_id">
+                            <div>
+                                <strong t-field="line.name_short"/>
+                            </div>
+                        </td>
+                        <td class='td-qty'>
+                            <div t-esc="line.product_uom_qty"/>
+                        </td>
+                        <td class="text-center td-price">
+                            <span t-field="line.price_reduce_taxexcl" style="white-space: nowrap;"
+                                  t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"
+                                  groups="account.group_show_line_subtotals_tax_excluded"/>
+                            <span t-field="line.price_reduce_taxinc" style="white-space: nowrap;"
+                                  t-options="{'widget': 'monetary', 'display_currency': website_sale_order.currency_id}"
+                                  groups="account.group_show_line_subtotals_tax_included"/>
+                        </td>
+                    </t>
+                </tr>
+            </tbody>
+        </xpath>
+    </template>
+
+    <template id="extra_step_rfq_table" inherit_id="website_sale.extra_info">
+        <xpath expr="//form" position="before">
+            <t t-if="website_sale_order.rfq_line_ids">
+                <t t-call="branom_website_rfq.rfq_table"/>
+            </t>
+        </xpath>
+        <xpath expr="//label[@for='Give us your feedback']" position="replace">
+            <label class="col-form-label" for="Give us your feedback">Comments</label>
+        </xpath>
+        <xpath expr="//a[@href='/shop/confirm_order']" position="replace">
+            <a role="button" class="btn btn-primary float-right mb32 o_website_form_send" href="/shop/confirm_order">
+                Proceed to Checkout
+                <span class="fa fa-chevron-right"/>
+            </a>
+        </xpath>
+    </template>
+
+    <template id="website_sale_extra_info_option_inherit" inherit_id="website_sale.extra_info_option">
+        <!-- Change this steps name to imply a new purpose -->
+        <xpath expr="//div[@id='wizard-step30']/parent::a" position="replace">
+            <!-- Could not target the Extra Info div in a safe way explicitly -->
+            <a t-if="website_sale_order.rfq_line_ids" class="no-decoration"
+               t-att-href="step&gt;=30 and '/shop/extra_info' or '#'">
+                <div id="wizard-step30"
+                     t-att-class="'progress-wizard-step %s' % (step == 30 and 'active' or step&gt;30 and 'complete' or 'disabled')">
+                    <div class="progress-wizard-bar d-none d-md-block"/>
+                    <span class="progress-wizard-dot d-none d-md-inline-block"/>
+                    <div class="text-center progress-wizard-steplabel">RFQ Submittal</div>
+                </div>
+            </a>
+        </xpath>
+    </template>
+
+    <template id="header" inherit_id="website.layout" name="Header Quick Order Link">
+        <xpath expr="//header//ul[@id='top_menu']/li" position="before">
+            <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
+            <!--            <li class="nav-item divider d-none"/> &lt;!&ndash; Make sure the cart and related menus are not folded (see autohideMenu) &ndash;&gt;-->
+            <li t-if="website_sale_order.rfq_line_ids" t-attf-class="nav-item">
+                <a href="/shop/rfq/form" class="nav-link">
+                    Quote Request
+                    <sup t-attf-class="my_rfq_quantity badge badge-primary" t-esc="website_sale_order and website_sale_order.rfq_quantity or ''"/>
+                </a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="website_sale_products_item_inherit" inherit_id="website_sale.products_item">
+        <xpath expr="//div[hasclass('o_wsale_product_information')]" position="replace">
+            <t t-if="website">
+                <t t-set="website_sale_order" t-value="website.sale_get_order()"/>
+                <t t-set="rfq_product" t-value="product.is_rfq_product(partner)"/>
+            </t>
+            <t t-else="">
+                <t t-set="website_sale_order" t-value="False"/>
+                <t t-set="rfq_product" t-value="False"/>
+            </t>
+            <div class="card-body p-0 text-center o_wsale_product_information">
+                <div class="p-2 o_wsale_product_information_text">
+                    <h6 class="o_wsale_products_item_title">
+                        <a itemprop="name" t-att-href="product_href" t-att-content="product.name"
+                           t-field="product.name"/>
+                        <a role="button" t-if="not product.website_published" t-att-href="product_href"
+                           class="btn btn-sm btn-danger" title="This product is unpublished.">Unpublished
+                        </a>
+                    </h6>
+                    <div t-if="rfq_product" class="product_price" itemprop="offers" itemscope="itemscope"
+                         itemtype="http://schema.org/Offer">
+                        <del t-attf-class="text-danger mr-2 {{'' if combination_info['has_discounted_price'] else 'd-none'}}"
+                             style="white-space: nowrap;" t-esc="combination_info['list_price']"
+                             t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                        <span t-if="combination_info['price']" t-esc="combination_info['price']"
+                              t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                        <span itemprop="price" style="display:none;" t-esc="combination_info['price']"/>
+                        <span itemprop="priceCurrency" style="display:none;" t-esc="website.currency_id.name"/>
+                    </div>
+                </div>
+                <div class="o_wsale_product_btn"/>
+            </div>
+        </xpath>
+    </template>
+
+
+</odoo>

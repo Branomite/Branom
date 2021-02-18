@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Partner shipping account line items on /shop/payment -->
+    <template id="partner_shipping_accounts">
+        <input t-att-value="p_delivery.id" t-att-id="'delivery_%i' % p_delivery.id" type="radio" name="delivery_type" data-is_partner_shipping="1"
+               t-att-checked="order.carrier_id and order.carrier_id.id == p_delivery.id and 'checked' or False" t-att-class="'d-none' if accounts_nb == 1 else ''"/>
+        <label class="label-optional"><t t-esc="p_delivery.description"/></label>
+        <t t-set='badge_class' t-value="(accounts_nb != 1 and 'float-right ' or '') + 'badge badge-secondary'" />
+          <span t-att-class="badge_class">Actual shipping charges to be determined based on your account details</span>
+    </template>
+
+    <!-- Add line items to inherited view /shop/payment -->
+    <template id="website_sale_delivery_inherit" inherit_id="website_sale_delivery.payment_delivery">
+        <xpath expr="//div[@id='payment_method']" position="before">
+            <t t-set="partner_shipping_accounts" t-value="request.env.user.partner_id._get_portal_shipping_accounts()"/>
+            <div t-if="partner_shipping_accounts" id="partner_delivery_carrier">
+                <p class="mb8 mt8"><strong>Your Shipping Accounts</strong></p>
+                <div class="card border-0" id="partner_delivery_method">
+                    <ul class="list-group">
+                    <t t-foreach="partner_shipping_accounts" t-as="p_delivery">
+                        <li class="list-group-item o_delivery_carrier_select">
+                            <t t-call="branom_website_partner_delivery.partner_shipping_accounts"/>
+                        </li>
+                    </t>
+                    </ul>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

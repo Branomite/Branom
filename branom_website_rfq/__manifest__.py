@@ -1,28 +1,27 @@
 {
-    'name': 'Branom Website Sale',
+    'name': 'Branom Website RFQ',
     'author': 'Hibou Corp. <hello@hibou.io>',
     'version': '13.0.1.0.0',
     'category': 'Sale',
     'description': """
-Customizations to website_sale
+Customizations to website_sale to add quote request functionality
     """,
     'website': 'https://hibou.io/',
     'depends': [
         'crm',
         'sale',
+        'website',
         'website_sale',
         'website_sale_wishlist',
-        'branom_website_rfq',
     ],
     'data': [
-        'views/account_portal_payment_templates.xml',
-        'views/payment_templates.xml',
+        'security/ir.model.access.csv',
+        'views/crm_views.xml',
         'views/product_views.xml',
-        'views/quick_order_templates.xml',
-        'views/templates.xml',
-        'views/save_products_templates.xml',
+        'views/quote_request_template.xml',
+        'views/sale_views.xml',
+        'views/website_templates.xml',
         'views/web_assets.xml',
-        'views/website_views.xml',
     ],
     'installable': True,
     'application': False,
