@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
-    <template id="header" inherit_id="website.layout" name="Header Quick Order Link">
+    <template id="header_sr" inherit_id="website.layout" name="Header Quick Order Link">
         <xpath expr="//header//ul[@id='top_menu']/li" position="before">
             <li t-attf-class="nav-item">
                 <a href="/service" class="nav-link">
