@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-    <template id="header" inherit_id="website.layout" name="Header Quick Order Link">
+    <template id="header_qo" inherit_id="website.layout" name="Header Quick Order Link">
         <xpath expr="//header//ul[@id='top_menu']/li" position="before">
             <!--            <t t-set="website_sale_order" t-value="website.sale_get_order()"/>-->
 <!--            <li class="nav-item divider d-none"/> &lt;!&ndash; Make sure the cart and related menus are not folded (see autohideMenu) &ndash;&gt;-->
