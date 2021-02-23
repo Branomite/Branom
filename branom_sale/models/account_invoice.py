@@ -52,6 +52,10 @@ class AccountMove(models.Model):
                     discount = ((new_list_price - price) / new_list_price) * 100.0
                     if (discount > 0.0 and new_list_price > 0.0) or (discount < 0.0 and new_list_price < 0.0):
                         line.discount = discount
+                        # changes fields related to the new unit price/discount
+                        line._onchange_price_subtotal()
+            # remakes offset lines
+            inv._onchange_invoice_line_ids()
 
 
 class AccountMoveLine(models.Model):
