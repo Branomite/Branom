@@ -8,6 +8,10 @@ class TestFlow(common.TransactionCase):
         super().setUp()
         self.customer_1 = self.env.ref('base.res_partner_12')
         self.product_1 = self.env.ref('product.product_product_4d')
+        self.product_1.type = 'product'
+        self.product_1.invoice_policy = 'delivery'
+        self.product_1.categ_id.property_cost_method = 'standard'
+        self.product_1.categ_id.property_valuation = 'real_time'
         self.product_2 = self.env.ref('website_sale.product_product_1')
         # just Expenses, account
         self.commission_account = self.env.ref('l10n_generic_coa.1_expense')
@@ -131,6 +135,7 @@ class TestFlow(common.TransactionCase):
         self.assertTrue(so_commission.invoice_ids)
 
         invoice = so_commission.invoice_ids
+        self.assertTrue(invoice)
         self.assertNotEqual(invoice.invoice_line_ids.account_id, self.commission_account)
         invoice.unlink()
 
@@ -139,4 +144,32 @@ class TestFlow(common.TransactionCase):
         wiz = self.env['sale.advance.payment.inv'].with_context(active_ids=so_commission.ids).create({})
         wiz.create_invoices()
         invoice = so_commission.invoice_ids
+        self.assertTrue(invoice)
         self.assertEqual(invoice.invoice_line_ids.account_id, self.commission_account)
+
+        invoice.post()
+        self.assertEqual(len(invoice.line_ids), 2, 'Commission Invoice posted with anglo-saxon lines.')
+
+    def test_5_regular_invoice(self):
+        # regular sale is not invoicable without shipping, this is a workaround
+        self.product_1.invoice_policy = 'order'
+        so = self.env['sale.order'].create({
+            'partner_id': self.customer_1.id,
+            'order_line': [
+                (0, 0, {
+                    'product_id': self.product_1.id,
+                    'name': 'Test Product Line',
+                    'price_unit': 1.0,
+                }),
+            ],
+        })
+        so.action_confirm()
+        self.assertTrue(so.state in ('sale', 'done'))
+        wiz = self.env['sale.advance.payment.inv'].with_context(active_ids=so.ids).create({})
+        wiz.create_invoices()
+        self.assertTrue(so.invoice_ids)
+
+        invoice = so.invoice_ids
+        self.assertTrue(invoice)
+        invoice.post()
+        self.assertEqual(len(invoice.line_ids), 4, 'Invoice posted without anglo-saxon lines.')
