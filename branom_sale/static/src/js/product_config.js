@@ -2,66 +2,42 @@ odoo.define('branom_sale.ProductConfiguratorFormRendererBranom', function (requi
 'use strict';
 
     var ProductConfiguratorFormRenderer = require('sale_product_configurator.ProductConfiguratorFormRenderer');
+    var core = require('web.core');
+    var _t = core._t;
 
-var ProductConfiguratorFormRendererBranom = ProductConfiguratorFormRenderer.include({
-    /**
-     * @override
-     */
+    console.log('branom_sale.ProductConfiguratorFormRendererBranom v2');
 
-    _checkExclusions: function ($parent, combination) {
-        this._super.apply(this, arguments);
-        function hide_excluded_products($parent) {
-            function setOriginalSelect ($select) {
-                if ($select.data("originalHTML") == undefined) {
-                    $select.find('option').each( function() {
-                        $(this).removeAttr('class');
-                        $(this).removeAttr('selected');
-                    }
-                    );
-                    $select.data("originalHTML", $select.html());
-                } // Only reset if empty
-            }
+    var ProductConfiguratorFormRendererBranom = ProductConfiguratorFormRenderer.include({
+        /**
+         * @override
+         * Don't actually disable it.
+         */
+        _disableInput: function ($parent, attributeValueId, excludedBy, attributeNames, productName) {
+            var $input = $parent
+                .find('option[value=' + attributeValueId + '], input[value=' + attributeValueId + ']');
+            $input.addClass('css_not_available');
+            $input.closest('label').addClass('css_not_available');
+            // $input.prop('disabled', true);
 
-            function restoreOptions ($select, cur_selected) {
-                var ogHTML = $select.data("originalHTML");
-                if (ogHTML != undefined) {
-                    $select.html(ogHTML);
+            if (excludedBy && attributeNames) {
+                var $target = $input.is('option') ? $input : $input.closest('label').add($input);
+                var excludedByData = [];
+                if ($target.data('excluded-by')) {
+                    excludedByData = JSON.parse($target.data('excluded-by'));
                 }
-                $select.find('option').each( function() {
-                        if ($(this).val() == cur_selected) {
-                            $(this).attr("selected","selected");
-                        }
-                    });
-            }
 
-            var product_exclusions = $parent.find('ul[data-attribute_exclusions]').data('attribute_exclusions').exclusions
-            // Grab the values that are currently selected
-            var values = [];
-            var variantsValuesSelectors = [
-                'input.js_variant_change:checked',
-                'select.js_variant_change'
-            ];
-            _.each($parent.find(variantsValuesSelectors.join(', ')), function (el) {
-                values.push(+$(el).val());
-                $(el).each(function(){
-                    setOriginalSelect($(this));
-                    restoreOptions($(this), +$(el).val());
-                });
-            });
-            //Handle radio button with hide/show
-            $('input').parent().parent().show();
-            for (var val of values) {
-                var hide = product_exclusions[val]
-                for (var h of hide) {
-                    $('option[value="'+ h +'"]').remove();
-                    $('input[value="'+ h +'"]').parent().parent().hide();
+                var excludedByName = attributeNames[excludedBy];
+                if (productName) {
+                    excludedByName = productName + ' (' + excludedByName + ')';
                 }
-            }
-        } // End hide_excluded_products
-        hide_excluded_products($parent);
-    },
-});
+                excludedByData.push(excludedByName);
 
-return ProductConfiguratorFormRendererBranom;
+                $target.attr('title', _.str.sprintf(_t('Not available with %s'), excludedByData.join(', ')));
+                $target.data('excluded-by', JSON.stringify(excludedByData));
+            }
+        },
+    });
+
+    return ProductConfiguratorFormRendererBranom;
 
 });

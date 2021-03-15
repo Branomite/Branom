@@ -62,7 +62,7 @@
     'license': 'OEEL-1',
 
     # any module necessary for this one to work correctly
-    'depends': ['account', 'product', 'sale_account_taxcloud', 'sale_stock', 'website_sale'],
+    'depends': ['account', 'product', 'sale_account_taxcloud', 'sale_stock', 'website_sale', 'sale_product_configurator'],
 
     # always loaded
     'data': [
