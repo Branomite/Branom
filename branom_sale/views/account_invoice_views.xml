@@ -21,5 +21,48 @@
                 </xpath>
             </field>
         </record>
+
+        <!-- Account Move Line Views -->
+        <record id="view_account_move_line_tree" model="ir.ui.view">
+            <field name="name">account.move.line.tree</field>
+            <field name="model">account.move.line</field>
+            <field name="arch" type="xml">
+                <tree string="Invoice Line">
+                    <field name="partner_id" string="Partner"/>
+                    <field name="delivery_city" string="Delivery City"/>
+                    <field name="delivery_state" string="Delivery State"/>
+                    <field name="delivery_zip" string="Delivery Zip"/>
+                    <field name="name" string="Description"/>
+                    <field name="product_manufacturer_id" string="Manufacturer"/>
+                    <field name="quantity"/>
+                    <field name="product_cost"/>
+                    <field name="extended_cost"/>
+                    <field name="price_unit"/>
+                    <field name="price_subtotal" string="Extended Price" groups="account.group_show_line_subtotals_tax_excluded"/>
+                    <field name="product_margin"/>
+                    <field name="sales_team"/>
+                    <field name="origin"/>
+                    <field name="account_id" groups="account.group_account_user"/>
+                    <field name="currency_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_pos_report_all" model="ir.actions.act_window">
+            <field name="name">CCNW POS Reports</field>
+            <field name="res_model">account.move.line</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_move_line_tree"/>
+            <!--            <field name="search_view_id" ref="view_order_product_search"/>-->
+            <!--            <field name="context">{'search_default_Sales':1, 'group_by_no_leaf':1,'group_by':[]}</field>-->
+            <field name="help">This report is a re-creation of the studio CCNW POS Reports</field>
+        </record>
+
+        <menuitem id="menu_pos_report"
+                  name="POS Report"
+                  parent="account.menu_finance_reports"
+                  action="action_pos_report_all"
+                  sequence="5"/>
+
     </data>
 </odoo>

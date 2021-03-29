@@ -66,6 +66,8 @@ class ProductTemplate(models.Model):
                                             inverse_name='product_tmpl_id',
                                             string='Product Template Attributes Exclusions')
 
+    manufacturer_id = fields.Many2one('res.partner', string='Manufacturer', domain="[('is_company', '=', True)]")
+
     def write(self, vals):
         res = super(ProductTemplate, self).write(vals)
         for tmpl in self.filtered(lambda t: len(t.product_variant_ids) == 1):

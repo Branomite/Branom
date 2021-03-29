@@ -61,6 +61,27 @@ class AccountMove(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
+    # Related move fields
+    delivery_city = fields.Char(related='move_id.partner_shipping_id.city')
+    delivery_state = fields.Many2one(related='move_id.partner_shipping_id.state_id')
+    delivery_zip = fields.Char(related='move_id.partner_shipping_id.zip')
+    invoice_date = fields.Date(related='move_id.invoice_date')
+    origin = fields.Char(related='move_id.invoice_origin')
+    sales_team = fields.Many2one(related='move_id.team_id')
+
+    # Related product fields
+    product_cost = fields.Float(related='product_id.standard_price', string='Product Cost')
+    product_manufacturer_id = fields.Many2one(related='product_id.manufacturer_id', string='Manufacturer')
+    extended_cost = fields.Monetary(string='Extended Cost')
+    product_margin = fields.Monetary(compute='_compute_product_margin', string='Product Margin')
+
+    def _compute_product_margin(self):
+        for record in self:
+            if record.price_unit > 0 and record.product_cost > 0:
+                record.product_margin = (record.price_unit / record.product_cost) * 100
+            else:
+                record.product_margin = 0.00
+
     @api.model_create_multi
     def create(self, vals_list):
         res = super(AccountMoveLine, self).create(vals_list)
