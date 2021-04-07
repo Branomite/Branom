@@ -21,13 +21,17 @@ Similar to the need expressed in the last section, Branom needs to display the c
     'license': 'OEEL-1',
 
     # any module necessary for this one to work correctly
-    'depends': ['sale_management'],
+    'depends': [
+        'account',
+        'account_accountant',
+        'sale_management'
+    ],
 
     # always loaded
     'data': [
         'views/account_invoice_views.xml',
         'views/account_payment_views.xml',
-        'views/product_views.xml'
+        'views/product_views.xml',
     ],
 
 }
