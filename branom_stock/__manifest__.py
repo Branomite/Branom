@@ -15,5 +15,7 @@ Sets the delivery carrier service type and carrier on stock picking on creation
         'delivery_ups',
     ],
     'auto_install': False,
-    'data': [],
+    'data': [
+        'views/delivery_views.xml'
+    ],
 }
