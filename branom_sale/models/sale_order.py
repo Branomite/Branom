@@ -17,6 +17,14 @@ class SaleOrder(models.Model):
                 line.qty_delivered = line.product_uom_qty
         return res
 
+    def set_delivery_line(self, carrier, amount):
+        res = super().set_delivery_line(carrier, amount)
+        # Always set the current delivery type on the sale order for UPS
+        if carrier.delivery_type == 'ups':
+            self.ups_service_type = carrier.ups_default_service_type
+
+        return res
+
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
