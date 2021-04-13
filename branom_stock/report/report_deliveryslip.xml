@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="report_delivery_document_inherit_branom" inherit_id="stock.report_delivery_document">
+        <xpath expr="//div[hasclass('page')]/h2" position="before">
+            <div class="row mb32" t-field="o.sale_id.partner_id" t-options-widget="'contact'"/>
+        </xpath>
+        <xpath expr="//div[@name='div_sched_date']" position="replace"/>
+        <xpath expr="//table[@name='stock_move_table']//p" position="replace"/>
+        <xpath expr="//table[@name='stock_move_line_table']//p" position="replace"/>
+    </template>
+</odoo>
