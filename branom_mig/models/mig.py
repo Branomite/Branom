@@ -1,4 +1,6 @@
+import xmlrpc.client as rpc
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 from logging import getLogger
 _logger = getLogger(__name__)
@@ -7,6 +9,14 @@ _logger = getLogger(__name__)
 class MigBase(models.Model):
     _name = 'mig.base'
     _description = 'Branom MIG'
+
+    def authenticate(self, username=None, password=None, database=None, url=None):
+        common = rpc.ServerProxy('{}/xmlrpc/2/common'.format(url))
+        uid = common.authenticate(database, username, password, {})
+
+        if not uid:
+            raise UserError('Failed to get UID.  Please check your credentials and try again.')
+        return uid
 
     def get_model_fields(self):
         # Test comment

@@ -1,9 +1,57 @@
+import xmlrpc.client as rpc
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
+
+from logging import getLogger
+_logger = getLogger(__name__)
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+
+    def mig_all_product_datasheets(self, username=None, password=None, database=None, url=None):
+        auth = self.env['mig.base'].authenticate(username=username, password=password, database=database, url=url)
+        # Get a list of the products that have a binary file from remote first
+        remote = rpc.ServerProxy('{}/xmlrpc/2/object'.format(url))
+        remote_records = remote.execute_kw(database, auth, password, 'product.template', 'search_read', [[['x_studio_product_datasheet', '!=', False]]], {'fields': ['default_code']})
+
+        # Build a list of only products we know have a datasheet
+        default_code_list = []
+        for remote_record in remote_records:
+            default_code_list.append(remote_record.get('default_code'))
+
+        # Get local products that are in list and don't already have a datasheet
+        local_products = self.env['product.template'].search([('default_code', 'in', default_code_list), ('product_datasheet', '=', False)])
+        filtered_products = local_products.filtered(lambda l: l.default_code != False and l.default_code != 'TBD')
+
+        products_count = len(filtered_products)
+        product_count = 1
+
+        for product in filtered_products:
+            _logger.warn('Product %s/%s' % (product_count, products_count))
+            product.mig_product_datasheet(auth=auth, password=password, database=database, url=url)
+            product_count += 1
+            _logger.warn('_____________')
+
+
+    def mig_product_datasheet(self, auth=None, password=None, database=None, url=None):
+        models = rpc.ServerProxy('{}/xmlrpc/2/object'.format(url))
+
+        if self.default_code:
+            record = models.execute_kw(database, auth, password,
+                                       'product.template', 'search_read', [[['default_code', '=', self.default_code]]],
+                                       {'fields': ['x_studio_product_datasheet']})
+            if record:
+                record_info = record[0]
+                binary_data = record_info.get('x_studio_product_datasheet')
+                if binary_data:
+                    # Fix for padding errors
+                    binary_data += "=" * ((4 - len(binary_data) % 4) % 4)
+                    self.write({
+                        'product_datasheet': binary_data,
+                    })
+                    self.env.cr.commit()
+
 
     @api.model
     def match_attr_vals_to_studio_vals(self):

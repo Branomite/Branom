@@ -27,4 +27,17 @@
         <field eval="False" name="doall"/>
     </record>
 
+    <record model="ir.cron" id="ir_cron_product_data_mig_product_datasheets">
+        <field name="name">BRANOM MIG: Retrieve product data sheets from Odoo 12</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="state">code</field>
+        <field name="code">model.mig_all_product_datasheets(username=None, password=None, database=None, url=None)</field>
+        <field eval="False" name="active"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field eval="False" name="doall"/>
+    </record>
+
 </odoo>
