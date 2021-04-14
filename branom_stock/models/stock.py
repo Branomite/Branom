@@ -4,6 +4,8 @@ from odoo import api, fields, models
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
+    show_address = fields.Boolean('Show Address', compute='_compute_show_address')
+
     @api.model
     def create(self, vals):
         carrier_id_val = vals.get('carrier_id')
@@ -18,3 +20,8 @@ class StockPicking(models.Model):
                 sale_order.write(so_vals)
         res = super().create(vals)
         return res
+
+    @api.depends('picking_type_id', 'picking_type_code')
+    def _compute_show_address(self):
+        for picking in self:
+            picking.show_address = picking.picking_type_code == 'outgoing' and picking.picking_type_id.name != 'Will Call'

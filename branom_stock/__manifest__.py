@@ -6,7 +6,7 @@
     'description':
         """
 Customizations to Stock Module Functionality
-===================
+============================================
 
 Sets the delivery carrier service type and carrier on stock picking on creation
         """,
@@ -18,5 +18,6 @@ Sets the delivery carrier service type and carrier on stock picking on creation
     'data': [
         'report/report_deliveryslip.xml',
         'views/delivery_views.xml',
+        'views/stock_views.xml',
     ],
 }
