@@ -57,7 +57,7 @@ class ProductTemplate(models.Model):
                                     help='Base Manufacturer Product Code for computing Auto-Generated Manufacturing '
                                          'Code')
 
-    product_image_ids = fields.One2many('product.image', 'product_tmpl_id', string='Images', copy=True)
+    product_template_image_ids = fields.One2many('product.image', 'product_tmpl_id', string='Images', copy=True)
 
     attribute_line_ids = fields.One2many('product.template.attribute.line', 'product_tmpl_id',
                                          'Product Attributes', copy=True)
