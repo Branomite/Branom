@@ -25,21 +25,21 @@ class ProductProduct(models.Model):
     def create(self, vals_list):
         res = super(ProductProduct, self).create(vals_list)
         for prod in res:
-            # Create vendor list for each newly created product
-            vendor_ids = prod.product_tmpl_id.variant_seller_ids.mapped('name')
-
-            # Only allow creation of vendor pricelist/product if ONE vendor present per product
-            if len(vendor_ids) == 1:
-                pricelist = self.env['product.supplierinfo'].create([{
-                    'name': vendor_ids[0].id,
-                    'product_tmpl_id': prod.product_tmpl_id.id,
-                    'product_id': prod.id,
-                }])
-                # override price and set it to price with extra cost
-                pricelist.price = pricelist.price_with_extra
-
-            # only create code if has attr_values
             if prod.product_template_attribute_value_ids:
+                # Create vendor list for each newly created product
+                vendor_ids = prod.product_tmpl_id.variant_seller_ids.mapped('name')
+
+                # Only allow creation of vendor pricelist/product if ONE vendor present per product
+                if len(vendor_ids) == 1:
+                    pricelist = self.env['product.supplierinfo'].create([{
+                        'name': vendor_ids[0].id,
+                        'product_tmpl_id': prod.product_tmpl_id.id,
+                        'product_id': prod.id,
+                    }])
+                    # override price and set it to price with extra cost
+                    pricelist.price = pricelist.price_with_extra
+
+                # only create code if has attr_values
                 prod.default_code = prod.generate_extra_code()
         return res
 
@@ -131,10 +131,9 @@ class SupplierInfo(models.Model):
 
     # Compute the total cost extra, includes: product.template's base_standard_price + product.supplierinfo's cost_extra
     # @api.depends('product_tmpl_id', 'product_tmpl_id.base_standard_price', 'cost_extra')
-    @api.depends('product_tmpl_id', 'cost_extra')
+    @api.depends('product_tmpl_id', 'product_id', 'cost_extra')
     def _compute_cost_variant(self):
-        for vendor_list in self:
-            if vendor_list.product_tmpl_id:
-                vendor_list.price_with_extra = vendor_list.product_tmpl_id.base_standard_price + vendor_list.cost_extra
-                # Automatically set the price on vendor pricelist
-                vendor_list.price = vendor_list.price_with_extra
+        for vendor_list in self.filtered(lambda v: v.product_id and v.product_id.product_template_attribute_value_ids):
+            vendor_list.price_with_extra = vendor_list.product_tmpl_id.base_standard_price + vendor_list.cost_extra
+            # Automatically set the price on vendor pricelist
+            vendor_list.price = vendor_list.price_with_extra
