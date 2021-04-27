@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="portal_invoice_payment" inherit_id="account_payment.portal_invoice_payment" name="Branom Invoice Payment">
+        <xpath expr="//div[@id='payment_method']//t[@t-set='partner_id']" position="attributes">
+            <attribute name="t-value">invoice.partner_id.id</attribute>
+        </xpath>
+    </template>
+
+</odoo>

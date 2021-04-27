@@ -31,6 +31,7 @@ Similar to the need expressed in the last section, Branom needs to display the c
     'data': [
         'views/account_invoice_views.xml',
         'views/account_payment_views.xml',
+        'views/account_portal_templates.xml',
         'views/product_views.xml',
     ],
 
