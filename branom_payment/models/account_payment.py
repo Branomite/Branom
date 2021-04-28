@@ -85,7 +85,7 @@ class AccountPayment(models.Model):
     def _compute_refund_invoice_ids(self):
         for payment in self:
             payment.refund_invoice_ids = self.env['account.move']
-            for invoice in payment.invoice_ids:
+            for invoice in payment.invoice_ids.filtered(lambda i: i.type in ('out_refund', 'in_refund')):
                 for move_line in invoice.invoice_line_ids:
                     if move_line.payment_id:
                         payment.refund_invoice_ids |= move_line.move_id
