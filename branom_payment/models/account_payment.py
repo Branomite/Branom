@@ -79,19 +79,15 @@ MAP_INVOICE_TYPE_PAYMENT_SIGN = {
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    refund_invoice_ids = fields.Many2many(comodel_name='account.move', string='Credit Notes', compute='_compute_refund_invoice_ids', inverse='_set_refund_invoice_ids', readonly=False, store=True)
+    refund_invoice_ids = fields.Many2many(comodel_name='account.move', string='Credit Notes', compute='_compute_refund_invoice_ids')#, inverse='_set_refund_invoice_ids', store=True, reaonly=False)
 
     @api.depends('invoice_ids')
     def _compute_refund_invoice_ids(self):
         for payment in self:
             payment.refund_invoice_ids = self.env['account.move']
-            for invoice in payment.invoice_ids.filtered(lambda i: i.type in ('out_refund', 'in_refund')):
-                for move_line in invoice.invoice_line_ids:
-                    if move_line:
-                        payment.refund_invoice_ids |= move_line.move_id
-
-    def _set_refund_invoice_ids(self):
-        pass
+            for invoice in payment.invoice_ids:
+                t = self.env['account.move'].browse([i['move_id'] for i in invoice._get_reconciled_info_JSON_values()])
+                payment.refund_invoice_ids |= t.filtered(lambda i: i.type in ('in_refund', 'out_refund'))
 
     def post(self):
         res = super(AccountPayment, self).post()
