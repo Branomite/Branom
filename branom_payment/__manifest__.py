@@ -22,9 +22,9 @@ Similar to the need expressed in the last section, Branom needs to display the c
 
     # any module necessary for this one to work correctly
     'depends': [
-        'account',
         'account_accountant',
-        'sale_management'
+        'account_payment',
+        'sale_management',
     ],
 
     # always loaded
