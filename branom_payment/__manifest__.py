@@ -25,6 +25,9 @@ Similar to the need expressed in the last section, Branom needs to display the c
         'account_accountant',
         'account_payment',
         'sale_management',
+        'account_payment_disperse',
+        'account_check_printing',
+        'l10n_us_check_printing',
     ],
 
     # always loaded
@@ -33,6 +36,7 @@ Similar to the need expressed in the last section, Branom needs to display the c
         'views/account_payment_views.xml',
         'views/account_portal_templates.xml',
         'views/product_views.xml',
+        'views/print_check_reports.xml',
     ],
 
 }
