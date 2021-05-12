@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="ckus_stub_inherit" name="ckus_stub_inherit" inherit_id="l10n_us_check_printing.ckus_stub">
+        <xpath expr="//table[@t-if=&quot;page['stub_lines']&quot;]/thead/tr" position="replace">
+<!--            <tr>-->
+<!--                <th class="text-left">Due Date</th>-->
+<!--                <th class="text-left">Description</th>-->
+<!--                <th class="text-right">Invoice Amount</th>-->
+<!--                <th class="text-right">Balance Due</th>-->
+<!--                <th class="text-right">Payment</th>-->
+<!--            </tr>-->
+            <tr>
+                <th class="text-left">Due Date</th>
+                <th class="text-left">Description</th>
+                <th class="text-right">Invoice Amount</th>
+                <th class="text-right">Discount Taken</th>
+                <th class="text-right">Payment</th>
+            </tr>
+        </xpath>
+        <xpath expr="//table[@t-if=&quot;page['stub_lines']&quot;]/tbody//t[@t-esc=&quot;stub_line['amount_residual']&quot;]" position="attributes">
+            <attribute name="t-esc">stub_line['amount_discount_taken']</attribute>
+        </xpath>
+    </template>
+
+</odoo>
