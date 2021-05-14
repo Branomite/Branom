@@ -1,12 +1,29 @@
 from odoo import models, fields, api, _
 from odoo.tools.misc import formatLang, format_date
-from odoo.addons.account_check_printing.models.account_payment import INV_LINES_PER_STUB
+from odoo.addons.account_check_printing.models import account_payment
+
+# our checks do not have two stub pages
+INV_LINES_PER_STUB = account_payment.INV_LINES_PER_STUB * 2
+account_payment.INV_LINES_PER_STUB = INV_LINES_PER_STUB
 
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
     refund_invoice_ids = fields.Many2many(comodel_name='account.move', string='Credit Notes', compute='_compute_refund_invoice_ids')
+
+    # recompute amount in words if missing
+    def do_print_checks(self):
+        if self:
+            check_layout = self[0].company_id.account_check_printing_layout
+            # A config parameter is used to give the ability to use this check format even in other countries than US, as not all the localizations have one
+            if check_layout != 'disabled' and (self[0].journal_id.company_id.country_id.code == 'US' or bool(self.env['ir.config_parameter'].sudo().get_param('account_check_printing_force_us_format'))):
+                values = {'state': 'sent'}
+                if not self.check_amount_in_words:
+                    values['check_amount_in_words'] = self.currency_id.amount_to_text(self.amount)
+                self.write(values)
+                return self.env.ref('l10n_us_check_printing.%s' % check_layout).report_action(self)
+        return super().do_print_checks()
 
     @api.depends('invoice_ids')
     def _compute_refund_invoice_ids(self):
@@ -117,9 +134,9 @@ class AccountPayment(models.Model):
             stub_lines = [self._check_make_stub_line(inv) for inv in invoices]
         else:
             stub_lines = [{'header': True, 'name': "Bills"}]
-            stub_lines += [self._check_make_stub_line(inv) for inv in debits]
+            stub_lines += [self._check_make_stub_line(inv, self.refund_invoice_ids) for inv in debits]
             stub_lines += [{'header': True, 'name': "Refunds"}]
-            stub_lines += [self._check_make_stub_line(inv) for inv in credits]
+            stub_lines += [self._check_make_stub_line(inv, self.refund_invoice_ids) for inv in credits]
 
         # Crop the stub lines or split them on multiple pages
         if not multi_stub:
@@ -140,16 +157,16 @@ class AccountPayment(models.Model):
 
         return stub_pages
 
-    def _check_make_stub_line(self, invoice):
+    def _check_make_stub_line(self, invoice, refund_invoice_ids):
         """ Return the dict used to display an invoice/refund in the stub
         """
         # Find the account.partial.reconcile which are common to the invoice and the payment
         if invoice.type in ['in_invoice', 'out_refund']:
             invoice_sign = 1
-            invoice_payment_reconcile = invoice.line_ids.mapped('matched_debit_ids').filtered(lambda r: r.debit_move_id in self.move_line_ids)
+            invoice_payment_reconcile = invoice.line_ids.mapped('matched_debit_ids').filtered(lambda r: r.debit_move_id in self.move_line_ids or r.debit_move_id.move_id in refund_invoice_ids)
         else:
             invoice_sign = -1
-            invoice_payment_reconcile = invoice.line_ids.mapped('matched_credit_ids').filtered(lambda r: r.credit_move_id in self.move_line_ids)
+            invoice_payment_reconcile = invoice.line_ids.mapped('matched_credit_ids').filtered(lambda r: r.credit_move_id in self.move_line_ids or r.credit_move_id.move_id in refund_invoice_ids)
 
         invoice_payment_discount = None
         if len(invoice_payment_reconcile) >= 2:
@@ -160,20 +177,30 @@ class AccountPayment(models.Model):
         if self.currency_id != self.journal_id.company_id.currency_id:
             if invoice_payment_discount:
                 amount_discount_taken = -abs(sum(invoice_payment_discount.mapped('amount_currency')))
-            amount_paid = abs(sum(invoice_payment_reconcile.mapped('amount_currency')))
+            if invoice in refund_invoice_ids:
+                # note that invoice does not have an equivilent to 'amount_currency'
+                amount_paid = abs(invoice.amount_total)
+            else:
+                amount_paid = abs(sum(invoice_payment_reconcile.mapped('amount_currency')))
         else:
             if invoice_payment_discount:
                 amount_discount_taken = -abs(sum(invoice_payment_discount.mapped('amount')))
-            amount_paid = abs(sum(invoice_payment_reconcile.mapped('amount')))
+            if invoice in refund_invoice_ids:
+                amount_paid = abs(invoice.amount_total)
+            else:
+                amount_paid = abs(sum(invoice_payment_reconcile.mapped('amount')))
 
         amount_residual = invoice_sign * invoice.amount_residual
 
         return {
             'due_date': format_date(self.env, invoice.invoice_date_due),
-            'number': invoice.ref and invoice.name + ' - ' + invoice.ref or invoice.name,
+            'date': format_date(self.env, invoice.invoice_date),
+            # 'number': invoice.ref and invoice.name + ' - ' + invoice.ref or invoice.name,
+            'number': invoice.ref or invoice.name,
+            'desc': invoice.invoice_origin or '',
             'amount_total': formatLang(self.env, invoice_sign * invoice.amount_total, currency_obj=invoice.currency_id),
             'amount_residual': formatLang(self.env, amount_residual, currency_obj=invoice.currency_id) if amount_residual * 10**4 != 0 else '-',
-            'amount_discount_taken': formatLang(self.env, invoice_sign * amount_discount_taken, currency_obj=self.currency_id),
+            'amount_discount_taken': formatLang(self.env, invoice_sign * amount_discount_taken, currency_obj=self.currency_id) if amount_discount_taken * 10**4 != 0 else '-',
             'amount_paid': formatLang(self.env, invoice_sign * amount_paid, currency_obj=self.currency_id),
             'currency': invoice.currency_id,
         }
