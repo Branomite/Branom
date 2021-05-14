@@ -1,25 +1,105 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
 
-    <template id="ckus_stub_inherit" name="ckus_stub_inherit" inherit_id="l10n_us_check_printing.ckus_stub">
-        <xpath expr="//table[@t-if=&quot;page['stub_lines']&quot;]/thead/tr" position="replace">
-<!--            <tr>-->
-<!--                <th class="text-left">Due Date</th>-->
-<!--                <th class="text-left">Description</th>-->
-<!--                <th class="text-right">Invoice Amount</th>-->
-<!--                <th class="text-right">Balance Due</th>-->
-<!--                <th class="text-right">Payment</th>-->
-<!--            </tr>-->
-            <tr>
-                <th class="text-left">Due Date</th>
-                <th class="text-left">Description</th>
-                <th class="text-right">Invoice Amount</th>
-                <th class="text-right">Discount Taken</th>
-                <th class="text-right">Payment</th>
-            </tr>
+    <template id="ckus_check_inherit" name="ckus_check_inherit" inherit_id="l10n_us_check_printing.ckus_check">
+        <xpath expr="//div[hasclass('ckus_check')][1]" position="before">
+            <style type="text/css">
+                .ckus_top_page .ckus_payee_name,
+                .ckus_top_page .ckus_memo {
+                    display: none;
+                }
+                .ckus_top_page .ckus_payee_addr {
+                    /* top: 1.65in; */
+                    top: 1.78in;
+                    /* left: 0.85in; */
+                    left: 0.97in;
+                }
+                .ckus_top_page .ckus_amount_in_word {
+                    /* top: 1.45in; */
+                    top: 1.09in;
+                    /* left: 0.25in; */
+                    left: 0.85in;
+                }
+                .ckus_top_page .ckus_date {
+                    /* top: 0.55in; */
+                    top: 0.80in;
+                    /* left: 6.51in; */
+                    left: 5.76in;
+                }
+                .ckus_top_page .ckus_amount {
+                    /* top: 1.07in; */
+                    top: 1.47in;
+                    /* left: 6.77in; */
+                }
+            </style>
         </xpath>
-        <xpath expr="//table[@t-if=&quot;page['stub_lines']&quot;]/tbody//t[@t-esc=&quot;stub_line['amount_residual']&quot;]" position="attributes">
-            <attribute name="t-esc">stub_line['amount_discount_taken']</attribute>
+    </template>
+
+    <template id="ckus_stub_inherit" name="ckus_stub_inherit" inherit_id="l10n_us_check_printing.ckus_stub">
+        <xpath expr="//table[@t-if=&quot;page['stub_lines']&quot;]" position="replace">
+            <style type="text/css">
+                .ckus_page .ckus_stub_1, .ckus_page .ckus_stub_2 {
+                    height: 6.5in;
+                }
+                .ckus_page .ckus_stub_2 {
+                    display: none;
+                }
+                .ckus_page .ckus_stub .summary_line {
+                    display: none;
+                }
+            </style>
+<!--            <table class="table table-bordered table-sm stub_lines" t-if="page['stub_lines']">-->
+<!--                <thead><tr>-->
+<!--                    <th class="text-left">Due Date</th>-->
+<!--                    <th class="text-left">Description</th>-->
+<!--                    <th class="text-right">Invoice Amount</th>-->
+<!--                    <th class="text-right">Balance Due</th>-->
+<!--                    <th class="text-right">Payment</th>-->
+<!--                </tr></thead>-->
+<!--                <tbody>-->
+<!--                    <t t-foreach="page['stub_lines']" t-as="stub_line">-->
+<!--                        <t t-if="stub_line.get('header')">-->
+<!--                            <tr><th colspan="6"><t t-esc="stub_line['name']"/></th></tr>-->
+<!--                        </t>-->
+<!--                        <t t-if="not stub_line.get('header')"><tr>-->
+<!--                            <td class="text-left"><t t-if="stub_line['due_date']" t-esc="stub_line['due_date']"/></td>-->
+<!--                            <td class="text-left text-truncate" style="max-width: 500px;"><t t-esc="stub_line['number']"/></td>-->
+<!--                            <td class="text-right"><t t-esc="stub_line['amount_total']"/></td>-->
+<!--                            <td class="text-right">-->
+<!--                                <t t-esc="stub_line['amount_residual']"/>-->
+<!--                            </td>-->
+<!--                            <td class="text-right"><t t-esc="stub_line['amount_paid']"/></td>-->
+<!--                        </tr></t>-->
+<!--                    </t>-->
+<!--                    <tr t-if="page['stub_cropped']"><td colspan="6" class="text-right">...</td></tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+            <table class="table table-bordered table-sm stub_lines" t-if="page['stub_lines']">
+                <thead><tr style="height: 0.4in !important;">
+                    <th class="text-left" style="width: 1.3in;"><span style="display:none;">Invoice Number</span></th>
+                    <th class="text-left" style="width: 1.0in;"><span style="display:none;">Invoice Date</span></th>
+                    <th class="text-right" style="width: 2.5in;"><span style="display:none;">Description</span></th>
+                    <th class="text-right" style="width: 1.3in;"><span style="display:none;">Gross Amount</span></th>
+                    <th class="text-right" style="width: 0.8in;"><span style="display:none;">Discount</span></th>
+                    <th class="text-right" style="width: 1.3in;"><span style="display:none;">Net Amount</span></th>
+                </tr></thead>
+                <tbody>
+                    <t t-foreach="page['stub_lines']" t-as="stub_line">
+<!--                        <t t-if="stub_line.get('header')">-->
+<!--                            <tr><th colspan="6"><t t-esc="stub_line['name']"/></th></tr>-->
+<!--                        </t>-->
+                        <t t-if="not stub_line.get('header')"><tr>
+                            <td class="text-left"><t t-if="stub_line.get('number')" t-esc="stub_line['number']"/></td>
+                            <td class="text-left"><t t-if="stub_line.get('date')" t-esc="stub_line['date']"/></td>
+                            <td class="text-left"><t t-if="stub_line.get('desc')" t-esc="stub_line['desc']"/></td>
+                            <td class="text-right"><t t-esc="stub_line['amount_total']"/></td>
+                            <td class="text-right"><t t-esc="stub_line['amount_discount_taken']"/></td>
+                            <td class="text-right"><t t-esc="stub_line['amount_paid']"/></td>
+                        </tr></t>
+                    </t>
+                    <tr t-if="page['stub_cropped']"><td colspan="6" class="text-right">...</td></tr>
+                </tbody>
+            </table>
         </xpath>
     </template>
 
