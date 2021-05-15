@@ -44,7 +44,8 @@
                 .ckus_page .ckus_stub_2 {
                     display: none;
                 }
-                .ckus_page .ckus_stub .summary_line {
+                .ckus_page .ckus_stub .summary_line,
+                .ckus_page .stub_total_amount {
                     display: none;
                 }
             </style>
