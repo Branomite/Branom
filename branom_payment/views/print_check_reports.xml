@@ -33,6 +33,9 @@
                 }
             </style>
         </xpath>
+        <xpath expr="//div[hasclass('ckus_amount')]/t" position="attributes">
+            <attribute name="t-esc">page['amount']</attribute>
+        </xpath>
     </template>
 
     <template id="ckus_stub_inherit" name="ckus_stub_inherit" inherit_id="l10n_us_check_printing.ckus_stub">
@@ -75,7 +78,7 @@
 <!--                    <tr t-if="page['stub_cropped']"><td colspan="6" class="text-right">...</td></tr>-->
 <!--                </tbody>-->
 <!--            </table>-->
-            <table class="table table-bordered table-sm stub_lines" t-if="page['stub_lines']">
+            <table class="table table-sm stub_lines" t-if="page['stub_lines']">
                 <thead><tr style="height: 0.4in !important;">
                     <th class="text-left" style="width: 1.3in;"><span style="display:none;">Invoice Number</span></th>
                     <th class="text-left" style="width: 1.0in;"><span style="display:none;">Invoice Date</span></th>
