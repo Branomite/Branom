@@ -76,7 +76,7 @@ class ProductTemplate(models.Model):
         return res
 
     def copy(self, default=None):
-        res = super(ProductTemplate, self).copy(default)
+        res = super(ProductTemplate, self).copy(dict(default or {}))
 
         # We need to create new exclusions that map the correct product.template.attribute.values
         # from the original copied prod.tmpl
