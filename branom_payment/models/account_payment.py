@@ -131,7 +131,7 @@ class AccountPayment(models.Model):
 
         # Prepare the stub lines
         if not credits:
-            stub_lines = [self._check_make_stub_line(inv) for inv in invoices]
+            stub_lines = [self._check_make_stub_line(inv, self.refund_invoice_ids) for inv in invoices]
         else:
             stub_lines = [{'header': True, 'name': "Bills"}]
             stub_lines += [self._check_make_stub_line(inv, self.refund_invoice_ids) for inv in debits]
