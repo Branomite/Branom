@@ -85,9 +85,10 @@ class SaleOrderLine(models.Model):
             else:
                 new_description = product.name + "\n"
 
-            for attr_val in product.mapped('product_template_attribute_value_ids.product_attribute_value_id'):
+            for tmpl_attr_val in product.product_template_attribute_value_ids:
+                attr_val = tmpl_attr_val.product_attribute_value_id
                 mc_code = attr_val.manufacture_code or ''
-                custom_val = self.product_custom_attribute_value_ids.filtered(lambda c: c.attribute_value_id == attr_val).custom_value
+                custom_val = self.product_custom_attribute_value_ids.filtered(lambda c: c.custom_product_template_attribute_value_id == tmpl_attr_val).custom_value
 
                 new_description = new_description + mc_code + ": " + attr_val.attribute_id.name + " - " + attr_val.name
                 # Handle custom value in desc
