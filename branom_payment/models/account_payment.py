@@ -3,7 +3,7 @@ from odoo.tools.misc import formatLang, format_date
 from odoo.addons.account_check_printing.models import account_payment
 
 # our checks do not have two stub pages
-INV_LINES_PER_STUB = account_payment.INV_LINES_PER_STUB * 2
+INV_LINES_PER_STUB = account_payment.INV_LINES_PER_STUB * 3
 account_payment.INV_LINES_PER_STUB = INV_LINES_PER_STUB
 
 
@@ -163,10 +163,12 @@ class AccountPayment(models.Model):
         # Find the account.partial.reconcile which are common to the invoice and the payment
         if invoice.type in ['in_invoice', 'out_refund']:
             invoice_sign = 1
-            invoice_payment_reconcile = invoice.line_ids.mapped('matched_debit_ids').filtered(lambda r: r.debit_move_id in self.move_line_ids or r.debit_move_id.move_id in refund_invoice_ids)
+            invoice_payment_reconcile = invoice.line_ids.mapped('matched_debit_ids').filtered(lambda r: r.debit_move_id in self.move_line_ids and r.debit_move_id.move_id not in refund_invoice_ids)
+            invoice_payment_credit = invoice.line_ids.mapped('matched_debit_ids').filtered(lambda r: r.debit_move_id.move_id in refund_invoice_ids)
         else:
             invoice_sign = -1
-            invoice_payment_reconcile = invoice.line_ids.mapped('matched_credit_ids').filtered(lambda r: r.credit_move_id in self.move_line_ids or r.credit_move_id.move_id in refund_invoice_ids)
+            invoice_payment_reconcile = invoice.line_ids.mapped('matched_credit_ids').filtered(lambda r: r.credit_move_id in self.move_line_ids and r.credit_move_id.move_id not in refund_invoice_ids)
+            invoice_payment_credit = invoice.line_ids.mapped('matched_credit_ids').filtered(lambda r: r.credit_move_id.move_id in refund_invoice_ids)
 
         invoice_payment_discount = None
         if len(invoice_payment_reconcile) >= 2:
@@ -188,7 +190,7 @@ class AccountPayment(models.Model):
             if invoice in refund_invoice_ids:
                 amount_paid = abs(invoice.amount_total)
             else:
-                amount_paid = abs(sum(invoice_payment_reconcile.mapped('amount')))
+                amount_paid = abs(sum(invoice_payment_reconcile.mapped('amount')) + sum(invoice_payment_credit.mapped('amount') or [0.0]))
 
         amount_residual = invoice_sign * invoice.amount_residual
 
