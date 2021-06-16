@@ -155,14 +155,6 @@ class AccountMoveLine(models.Model):
 
     exclude_discount = fields.Boolean('Exclude Discount')
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        res = super(AccountMoveLine, self).create(vals_list)
-        for rec in res:
-            # cannot call onchange product id since it will pull the original price for products
-            rec.exclude_discount = rec.product_id.exclude_discount
-        return res
-
     @api.onchange('product_id')
     def _onchange_product_id(self):
         vals = super(AccountMoveLine, self)._onchange_product_id()
